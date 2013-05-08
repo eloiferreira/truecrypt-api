@@ -1,0 +1,26 @@
+# VS Files
+*.user
+*.suo
+*.sdf
+*.opensdf
+ipch/
+
+# COM Auto-generated Sources
+*_h.h
+*_i.c
+
+# Build Files
+
+*.log
+*.tlb
+obj_driver_release/
+obj_driver_debug/
+Debug/
+Release/
+Boot/Windows/Release_AES/*
+Boot/Windows/Release_Serpent/*
+Boot/Windows/Release_Twofish/*
+Boot/Windows/Rescue/*
+Boot/Windows/Rescue_AES/*
+Boot/Windows/Rescue_Serpent/*
+Boot/Windows/Rescue_Twofish/*
