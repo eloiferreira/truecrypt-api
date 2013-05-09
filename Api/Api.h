@@ -2,7 +2,8 @@
 // we define those unconditionally. This library is supposed to be used with 
 // LoadLibrary/GetProcAddress way, so no importing required.
 
-#pragma once
+#ifndef API_H
+#define API_H
 
 #include "targetver.h"
 
@@ -22,4 +23,6 @@ DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

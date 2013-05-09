@@ -7,9 +7,7 @@ governed by license terms which are TBD. */
 
 #include "Tcdefs.h"
 
-#include <winerror.h>
-
-#include "Common.h"
+#include "OsInfo.h"
 #include "Errors.h"
 #include "Uac.h"
 

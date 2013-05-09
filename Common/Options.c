@@ -5,19 +5,7 @@ Modifications and additions to the original source code (contained in this file)
 and all other portions of this file are Copyright (c) 2013 Nic Nilov and are 
 governed by license terms which are TBD. */
 
-#ifndef UAC_H
-#define UAC_H
-
 #include <windows.h>
+#include "Options.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-BOOL IsAdmin();
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+BOOL bPreserveTimestamp = TRUE;

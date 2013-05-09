@@ -5,6 +5,12 @@ Modifications and additions to the original source code (contained in this file)
 and all other portions of this file are Copyright (c) 2013 Nic Nilov and are 
 governed by license terms which are TBD. */
 
+#ifndef ERRORS_H
+#define ERRORS_H
+
+#include <windows.h>
+#include <winerror.h>
+
 #define STATUS_SEVERITY_SUCCESS			0x0UL
 #define STATUS_SEVERITY_INFORMATIONAL	0x1UL
 #define STATUS_SEVERITY_WARNING			0x2UL
@@ -69,20 +75,28 @@ should reuse appropriate system-defined facility*/
 #define TCAPI_I_INFO					MAKE_TCAPI_INFO(1)
 
 #define TCAPI_E_ERROR					MAKE_TCAPI_ERROR(1)
+#define TCAPI_E_CANT_GET_OS_VER			MAKE_TCAPI_ERROR(2)
+#define TCAPI_E_UNSUPPORTED_OS			MAKE_TCAPI_ERROR(3)
 
 #define TCAPI_W_AUTOMOUNT_DISABLED		MAKE_TCAPI_WARNING(1)
 #define TCAPI_W_ASSIGN_DRIVE_LETTER		MAKE_TCAPI_WARNING(2)
 #define TCAPI_W_DEVICE_NOT_READY		MAKE_TCAPI_WARNING(3)
+#define TCAPI_W_LARGE_IDE_2K			MAKE_TCAPI_WARNING(4)
+#define TCAPI_W_LARGE_IDE_2K_REGISTRY	MAKE_TCAPI_WARNING(5)
+#define TCAPI_W_LARGE_IDE_XP			MAKE_TCAPI_WARNING(6)
 
-
-
-//SYS_ASSIGN_DRIVE_LETTER
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-DWORD handleWin32Error();
+	DWORD handleWin32Error();
+	BOOL IsDiskError (DWORD error);
+	BOOL IsDiskReadError (DWORD error);
+	BOOL IsDiskWriteError (DWORD error);
+	DWORD HandleDriveNotReadyError (DWORD reportedError);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

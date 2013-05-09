@@ -30,9 +30,6 @@
     <ClCompile Include="..\Common\GfMul.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Password.c">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\Volumes.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -57,6 +54,12 @@
     <ClCompile Include="..\Common\Uac.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\OsInfo.c">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Options.c">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Api.h">
@@ -65,16 +68,10 @@
     <ClInclude Include="..\Common\Tcdefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\Crypto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\GfMul.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Password.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Volumes.h">
@@ -99,6 +96,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Uac.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\OsInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
