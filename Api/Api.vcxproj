@@ -128,6 +128,9 @@
     <ClCompile Include="..\Common\EncryptionThreadPool.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\Errors.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\GfMul.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
@@ -138,6 +141,9 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Random.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\Common\Uac.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Volumes.c">
@@ -164,11 +170,13 @@
     <ClInclude Include="..\Common\Crc.h" />
     <ClInclude Include="..\Common\Crypto.h" />
     <ClInclude Include="..\Common\EncryptionThreadPool.h" />
+    <ClInclude Include="..\Common\Errors.h" />
     <ClInclude Include="..\Common\GfMul.h" />
     <ClInclude Include="..\Common\Password.h" />
     <ClInclude Include="..\Common\Pkcs5.h" />
     <ClInclude Include="..\Common\Random.h" />
     <ClInclude Include="..\Common\Tcdefs.h" />
+    <ClInclude Include="..\Common\Uac.h" />
     <ClInclude Include="..\Common\Volumes.h" />
     <ClInclude Include="..\Common\Xts.h" />
     <ClInclude Include="Api.h" />
