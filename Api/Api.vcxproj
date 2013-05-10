@@ -149,6 +149,9 @@
     <ClCompile Include="..\Common\Random.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\Strings.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\Uac.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
@@ -182,6 +185,7 @@
     <ClInclude Include="..\Common\Password.h" />
     <ClInclude Include="..\Common\Pkcs5.h" />
     <ClInclude Include="..\Common\Random.h" />
+    <ClInclude Include="..\Common\Strings.h" />
     <ClInclude Include="..\Common\Tcdefs.h" />
     <ClInclude Include="..\Common\Uac.h" />
     <ClInclude Include="..\Common\Volumes.h" />

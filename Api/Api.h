@@ -13,8 +13,6 @@
 
 #define DLLEXPORT __declspec(dllexport)
 
-#include "Common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

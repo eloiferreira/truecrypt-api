@@ -32,7 +32,7 @@
 #include "Endian.h"
 #include "Volumes.h"
 #include "Pkcs5.h"
-
+#include "Strings.h"
 
 /* Volume header v5 structure (used since TrueCrypt 7.0): */
 //
@@ -1193,6 +1193,27 @@ final_seq:
 		SetLastError (dwError);
 
 	return nStatus;
+}
+
+void CreateFullVolumePath (char *lpszDiskFile, const char *lpszFileName, BOOL * bDevice)
+{
+	UpperCaseCopy (lpszDiskFile, lpszFileName);
+
+	*bDevice = FALSE;
+
+	if (memcmp (lpszDiskFile, "\\DEVICE", sizeof (char) * 7) == 0)
+	{
+		*bDevice = TRUE;
+	}
+
+	strcpy (lpszDiskFile, lpszFileName);
+
+#if _DEBUG
+	OutputDebugString ("CreateFullVolumePath: ");
+	OutputDebugString (lpszDiskFile);
+	OutputDebugString ("\n");
+#endif
+
 }
 
 #endif // !defined (DEVICE_DRIVER) && !defined (TC_WINDOWS_BOOT)

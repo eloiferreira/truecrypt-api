@@ -18,15 +18,12 @@ governed by license terms which are TBD. */
 
 #include <io.h>
 
-void VerifyPasswordAndUpdate (HWND hwndDlg, HWND hButton, HWND hPassword, HWND hVerify, unsigned char *szPassword,
-	char *szVerify, BOOL keyFilesEnabled)
+BOOL VerifyPasswordAndUpdate (unsigned char *szPassword, char *szVerify, BOOL keyFilesEnabled)
 {
 	char szTmp1[MAX_PASSWORD + 1];
 	char szTmp2[MAX_PASSWORD + 1];
 	int k = GetWindowTextLength (hPassword);
 	BOOL bEnable = FALSE;
-
-	if (hwndDlg);		/* Remove warning */
 
 	GetWindowText (hPassword, szTmp1, sizeof (szTmp1));
 	GetWindowText (hVerify, szTmp2, sizeof (szTmp2));
@@ -130,8 +127,6 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 	DISK_GEOMETRY driveInfo;
 
 	if (oldPassword->Length == 0 || newPassword->Length == 0) return -1;
-
-	WaitCursor ();
 
 	CreateFullVolumePath (szDiskFile, lpszVolume, &bDevice);
 

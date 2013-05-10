@@ -172,6 +172,7 @@ int CreateVolumeHeaderInMemory (BOOL bBoot, char *encryptedHeader, int ea, int m
 BOOL ReadEffectiveVolumeHeader (BOOL device, HANDLE fileHandle, byte *header, DWORD *bytesRead);
 BOOL WriteEffectiveVolumeHeader (BOOL device, HANDLE fileHandle, byte *header);
 int WriteRandomDataToReservedHeaderAreas (HANDLE dev, CRYPTO_INFO *cryptoInfo, uint64 dataAreaSize, BOOL bPrimaryOnly, BOOL bBackupOnly);
+void CreateFullVolumePath (char *lpszDiskFile, const char *lpszFileName, BOOL * bDevice);
 #endif
 
 #endif // !TC_HEADER_Volume_VolumeHeader
