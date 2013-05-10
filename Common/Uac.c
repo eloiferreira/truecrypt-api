@@ -8,7 +8,29 @@ governed by license terms which are TBD. */
 #include <Shlobj.h>
 
 #include "Uac.h"
+#include "OsInfo.h"
+
+BOOL UacElevated = FALSE;
 
 BOOL IsAdmin() {
 	return IsUserAnAdmin();
+}
+
+BOOL IsUacSupported ()
+{
+	HKEY hkey;
+	DWORD value = 1, size = sizeof (DWORD);
+
+	if (!IsOSAtLeast (WIN_VISTA))
+		return FALSE;
+
+	if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", 0, KEY_READ, &hkey) == ERROR_SUCCESS)
+	{
+		if (RegQueryValueEx (hkey, "EnableLUA", 0, 0, (LPBYTE) &value, &size) != ERROR_SUCCESS)
+			value = 1;
+
+		RegCloseKey (hkey);
+	}
+
+	return value != 0;
 }

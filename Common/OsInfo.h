@@ -48,6 +48,8 @@ extern "C" {
 	extern BOOL IsServerOS;
 
 	DWORD InitOSVersionInfo ();
+	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
+	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
 
 #ifdef __cplusplus
 }

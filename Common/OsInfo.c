@@ -54,7 +54,13 @@ DWORD InitOSVersionInfo ()
 	else if (os.dwPlatformId == VER_PLATFORM_WIN32_NT && CurrentOSMajor == 6 && CurrentOSMinor == 2)
 		nCurrentOS = IsServerOS ? WIN_SERVER_2012 : WIN_8;
 	else
-		nCurrentOS = WIN_UNKNOWN;
+		return TCAPI_E_UNKNOWN_OS;	/* Original TrueCrypt code does nCurrentOS = WIN_UNKNOWN; here and goes on 
+									with that. This allows it to work in newly released OSes without modification, 
+									albeit probably in reduced functionality mode. We for now will return error 
+									from here and wait and see if this strategy is of any good. */
+
+									/* TODO: Should get back to this when it's clear what we do have to know 
+											 about OS in order to work. */
 
 	// Service pack check & warnings about critical MS issues
 	CurrentOSServicePack = osEx.wServicePackMajor;
@@ -91,4 +97,35 @@ DWORD InitOSVersionInfo ()
 			break;
 	}
 	return result;
+}
+
+BOOL IsOSAtLeast (OSVersionEnum reqMinOS)
+{
+	return IsOSVersionAtLeast (reqMinOS, 0);
+}
+
+// Returns TRUE if the operating system is at least reqMinOS and service pack at least reqMinServicePack.
+// Example 1: IsOSVersionAtLeast (WIN_VISTA, 1) called under Windows 2008, returns TRUE.
+// Example 2: IsOSVersionAtLeast (WIN_XP, 3) called under Windows XP SP1, returns FALSE.
+// Example 3: IsOSVersionAtLeast (WIN_XP, 3) called under Windows Vista SP1, returns TRUE.
+BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack)
+{
+	/* When updating this function, update IsOSAtLeast() in Ntdriver.c too. */
+
+	int major = 0, minor = 0;
+
+	switch (reqMinOS)
+	{
+		case WIN_2000:			major = 5; minor = 0; break;
+		case WIN_XP:			major = 5; minor = 1; break;
+		case WIN_SERVER_2003:	major = 5; minor = 2; break;
+		case WIN_VISTA:			major = 6; minor = 0; break;
+		case WIN_7:				major = 6; minor = 1; break;
+		case WIN_8:				major = 6; minor = 2; break;
+
+		default:				return FALSE;
+	}
+
+	return ((CurrentOSMajor << 16 | CurrentOSMinor << 8 | CurrentOSServicePack)
+		>= (major << 16 | minor << 8 | reqMinServicePack));
 }

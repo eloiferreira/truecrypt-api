@@ -14,7 +14,10 @@ governed by license terms which are TBD. */
 extern "C" {
 #endif
 
-BOOL IsAdmin();
+	extern BOOL UacElevated;
+
+	BOOL IsAdmin();
+	BOOL IsUacSupported ();
 
 #ifdef __cplusplus
 }

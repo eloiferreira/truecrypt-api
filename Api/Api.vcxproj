@@ -140,6 +140,9 @@
     <ClCompile Include="..\Common\OsInfo.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\Password.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\Pkcs5.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
@@ -176,6 +179,7 @@
     <ClInclude Include="..\Common\GfMul.h" />
     <ClInclude Include="..\Common\Options.h" />
     <ClInclude Include="..\Common\OsInfo.h" />
+    <ClInclude Include="..\Common\Password.h" />
     <ClInclude Include="..\Common\Pkcs5.h" />
     <ClInclude Include="..\Common\Random.h" />
     <ClInclude Include="..\Common\Tcdefs.h" />
