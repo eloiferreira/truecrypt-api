@@ -1,0 +1,6 @@
+======================================================================================================
+OS Version and Volume-related definitions
+======================================================================================================
+Not clear reason for choosing to put OS versions enum and a number of volume-related enums and a 
+struct in this separate file. Might have to do with dependencies from the driver. Volume-related 
+declarations seem to naturally fit to Volumes.h.

@@ -1,0 +1,54 @@
+======================================================================================================
+void InitOSVersionInfo ()
+======================================================================================================
+GetVersionEx called three times although only after the first one return value gets checked. This
+might be made on purpose though, it's very unlikely the function would fail after a successful try.
+
+Has room for optimization, 3 'if' condition paths contain very similar code.
+
+When OS version is unknown to the code, as when running under newly released OS, nCurrentOS is left 
+with WIN_UNKNOWN value, skewing result of subsequent IsOSVersionAtLeast calls. This might be a way 
+to enable minimal requirements mode, should keep this in mind and see if this is indeed so.
+
+When running under compatibility mode, OS version info will get initialized as specified by user. This
+might lead to discrepancy when installed driver and control application think of OS differently. 
+Should look into this later, may be implement a compatibility mode check.
+
+No check for Embedded editions of Windows is performed although site documentation states embedded 
+versions are not supported. Should check behaviour on such system.
+
+======================================================================================================
+BOOL IsServerOS ()
+======================================================================================================
+GetVersionExA return value not checked. This might be on purpose since this function would have been 
+called successfully in any execution path before.
+
+======================================================================================================
+void InitApp (HINSTANCE hInstance, char *lpszCommandLine)
+======================================================================================================
+Overall very messy. 
+
+OS version check 'if (CurrentOSMajor < 5)' should have been done earlier in initialization routine. 
+It's 'else' contains OS Service Pack check which could be done when getting general OS version info.
+
+After 'RegOpenKeyEx (HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\Atapi\\Parameters"'...
+the 'RegCloseKey (hkey)' always called while first call in the 'if' condition could potentially fail 
+leaving hKey uninitialized.
+
+More to that if initial RegOpenKeyEx fails, BigLBA mode is left undefined. This might be ok if the
+behaviour is related only to Atapi protocol.
+
+LBA checks performed for WIN_2000 only. As specified here: http://support.microsoft.com/kb/303013, 
+disabled Atapi LBA mode is still relevant to XP before SP1. WIN_XP at the same time checks for 
+preboot environment only.
+
+======================================================================================================
+IsOSVersionAtLeast through its proxy IsOSAtLeast
+======================================================================================================
+When OS version is not initialized or id is not found in the 'switch', throws GPF, which is 
+completely uncalled for. OS info by this time should've been verified and trusted.
+
+======================================================================================================
+IsUacSupported
+======================================================================================================
+Reason for EnableLUA regisry check is unclear. Any (non-embedded) Windows after WIN_VISTA has UAC.
