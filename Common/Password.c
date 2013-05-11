@@ -18,6 +18,18 @@ governed by license terms which are TBD. */
 
 #include <io.h>
 
+BOOL ValidatePassword(unsigned char *szPassword, unsigned char *szVerify, BOOL keyFilesEnabled) {
+	/* TrueCrypt tries to make password handling more secure through using locked VM pages and 
+	not making any text copies other than in stack with subsequent burn. We here are in a dll so 
+	we dont know where the password came from and how securely its handled by the application.
+	We can impose a requirement to pass the password here on a locked page and check if it's indeed 
+	locked. At lease this would require some effort on behalf of developer and might also keep him 
+	from unnecessarily multiplying copies of the password. Since I couldn't find a straight way 
+	to check if a page is locked (though there is gotta be one), here is a feeble attempt to infer
+	it while unlocking, which removes the page from working set and it *might* theoretically get 
+	paged before we lock it again. This is completely speculative and needs checking though. */
+}
+
 BOOL VerifyPasswordAndUpdate (unsigned char *szPassword, char *szVerify, BOOL keyFilesEnabled)
 {
 	char szTmp1[MAX_PASSWORD + 1];
