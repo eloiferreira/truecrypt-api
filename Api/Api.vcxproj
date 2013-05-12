@@ -175,6 +175,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Apidrvr.h" />
     <ClInclude Include="..\Common\Crc.h" />
     <ClInclude Include="..\Common\Crypto.h" />
     <ClInclude Include="..\Common\EncryptionThreadPool.h" />

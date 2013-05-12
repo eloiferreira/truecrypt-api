@@ -173,6 +173,9 @@ BOOL ReadEffectiveVolumeHeader (BOOL device, HANDLE fileHandle, byte *header, DW
 BOOL WriteEffectiveVolumeHeader (BOOL device, HANDLE fileHandle, byte *header);
 int WriteRandomDataToReservedHeaderAreas (HANDLE dev, CRYPTO_INFO *cryptoInfo, uint64 dataAreaSize, BOOL bPrimaryOnly, BOOL bBackupOnly);
 void CreateFullVolumePath (char *lpszDiskFile, const char *lpszFileName, BOOL * bDevice);
+int FakeDosNameForDevice (const char *lpszDiskFile, char *lpszDosDevice, char *lpszCFDevice, BOOL bNameOnly);
+int RemoveFakeDosName (char *lpszDiskFile, char *lpszDosDevice);
+BOOL GetPartitionInfo (const char *deviceName, PPARTITION_INFORMATION rpartInfo);
 #endif
 
 #endif // !TC_HEADER_Volume_VolumeHeader

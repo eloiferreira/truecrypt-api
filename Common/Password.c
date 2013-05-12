@@ -172,39 +172,32 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 	{
 		/* This is necessary to determine the hidden volume header offset */
 
-		if (dev == INVALID_HANDLE_VALUE)
-		{
+		PARTITION_INFORMATION diskInfo;
+		DWORD dwResult;
+		BOOL bResult;
+
+		bResult = DeviceIoControl (dev, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
+			&driveInfo, sizeof (driveInfo), &dwResult, NULL);
+
+		if (!bResult)
 			goto error;
+
+		bResult = GetPartitionInfo (lpszVolume, &diskInfo);
+
+		if (bResult)
+		{
+			hostSize = diskInfo.PartitionLength.QuadPart;
 		}
 		else
 		{
-			PARTITION_INFORMATION diskInfo;
-			DWORD dwResult;
-			BOOL bResult;
+			hostSize = driveInfo.Cylinders.QuadPart * driveInfo.BytesPerSector *
+				driveInfo.SectorsPerTrack * driveInfo.TracksPerCylinder;
+		}
 
-			bResult = DeviceIoControl (dev, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
-				&driveInfo, sizeof (driveInfo), &dwResult, NULL);
-
-			if (!bResult)
-				goto error;
-
-			bResult = GetPartitionInfo (lpszVolume, &diskInfo);
-
-			if (bResult)
-			{
-				hostSize = diskInfo.PartitionLength.QuadPart;
-			}
-			else
-			{
-				hostSize = driveInfo.Cylinders.QuadPart * driveInfo.BytesPerSector *
-					driveInfo.SectorsPerTrack * driveInfo.TracksPerCylinder;
-			}
-
-			if (hostSize == 0)
-			{
-				nStatus = ERR_VOL_SIZE_WRONG;
-				goto error;
-			}
+		if (hostSize == 0)
+		{
+			nStatus = ERR_VOL_SIZE_WRONG;
+			goto error;
 		}
 	}
 	else
@@ -310,10 +303,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 
 	RandSetHashFunction (cryptoInfo->pkcs5);
 
-	NormalCursor();
 	UserEnrichRandomPool (hwndDlg);
-	EnableElevatedCursorChange (hwndDlg);
-	WaitCursor();
 
 	/* Re-encrypt the volume header */ 
 	backupHeader = FALSE;
@@ -331,6 +321,14 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 		item that will be different for each pass will be the salt. This is sufficient to cause each "version"
 		of the header to differ substantially and in a random manner from the versions written during the
 		other passes. */
+
+		/* NN: Gutmann specifically says here: http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html#Epilogue 
+		that 35 times in reality is never needed, and, most importantly, current high-density technology
+		on disk hdd media would not reallistically allow to recover any data even after only 'a few passes of 
+		random scrubbing' rewrites. Flash media, SSD drives are whole another story. Here is another his 
+		article on this topic: http://www.cypherpunks.to/~peter/usenix01.pdf. This said not to diminish 
+		TrueCrypt effort to practice most stringent approach on security, but just to keep in mind a correct 
+		perspective on the topic. */
 
 		for (wipePass = 0; wipePass < PRAND_DISK_WIPE_PASSES; wipePass++)
 		{
@@ -413,7 +411,6 @@ error:
 		RemoveFakeDosName (szDiskFile, szDosDevice);
 
 	RandStop (FALSE);
-	NormalCursor ();
 
 	SetLastError (dwError);
 
@@ -424,7 +421,7 @@ error:
 		return nStatus;
 
 	if (nStatus != 0)
-		handleError (hwndDlg, nStatus);
+		SetLastError(nStatus);
 
 	return nStatus;
 }

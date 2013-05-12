@@ -770,3 +770,13 @@ BOOL FastPoll (void)
 	return TRUE;
 }
 
+void UserEnrichRandomPool (HWND hwndDlg)
+{
+	Randinit();
+
+	if (!IsRandomPoolEnrichedByUser())
+	{
+		INT_PTR result = DialogBoxParamW (hInst, MAKEINTRESOURCEW (IDD_RANDOM_POOL_ENRICHMENT), hwndDlg ? hwndDlg : MainDlg, (DLGPROC) RandomPoolEnrichementDlgProc, (LPARAM) 0);
+		SetRandomPoolEnrichedByUserStatus (result == IDOK);
+	}
+}

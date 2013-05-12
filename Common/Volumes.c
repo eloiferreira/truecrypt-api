@@ -1216,4 +1216,49 @@ void CreateFullVolumePath (char *lpszDiskFile, const char *lpszFileName, BOOL * 
 
 }
 
+int FakeDosNameForDevice (const char *lpszDiskFile, char *lpszDosDevice, char *lpszCFDevice, BOOL bNameOnly)
+{
+	BOOL bDosLinkCreated = TRUE;
+	sprintf (lpszDosDevice, "truecrypt%lu", GetCurrentProcessId ());
+
+	if (bNameOnly == FALSE)
+		bDosLinkCreated = DefineDosDevice (DDD_RAW_TARGET_PATH, lpszDosDevice, lpszDiskFile);
+
+	if (bDosLinkCreated == FALSE)
+		return ERR_OS_ERROR;
+	else
+		sprintf (lpszCFDevice, "\\\\.\\%s", lpszDosDevice);
+
+	return 0;
+}
+
+int RemoveFakeDosName (char *lpszDiskFile, char *lpszDosDevice)
+{
+	BOOL bDosLinkRemoved = DefineDosDevice (DDD_RAW_TARGET_PATH | DDD_EXACT_MATCH_ON_REMOVE |
+		DDD_REMOVE_DEFINITION, lpszDosDevice, lpszDiskFile);
+	if (bDosLinkRemoved == FALSE)
+	{
+		return ERR_OS_ERROR;
+	}
+
+	return 0;
+}
+
+BOOL GetPartitionInfo (const char *deviceName, PPARTITION_INFORMATION rpartInfo)
+{
+	BOOL bResult;
+	DWORD dwResult;
+	DISK_PARTITION_INFO_STRUCT dpi;
+
+	memset (&dpi, 0, sizeof(dpi));
+	wsprintfW ((PWSTR) &dpi.deviceName, L"%hs", deviceName);
+
+	bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_DRIVE_PARTITION_INFO, &dpi,
+		sizeof (dpi), &dpi, sizeof (dpi), &dwResult, NULL);
+
+	memcpy (rpartInfo, &dpi.partInfo, sizeof (PARTITION_INFORMATION));
+	return bResult;
+}
+
+
 #endif // !defined (DEVICE_DRIVER) && !defined (TC_WINDOWS_BOOT)
