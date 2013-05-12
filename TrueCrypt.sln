@@ -3,8 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crypto", "Crypto\Crypto.vcxproj", "{993245CF-6B70-47EE-91BB-39F8FC6DC0E7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Api", "Api\Api.vcxproj", "{493DDF50-624F-48BB-B8D9-39221C41999E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{993245CF-6B70-47EE-91BB-39F8FC6DC0E7} = {993245CF-6B70-47EE-91BB-39F8FC6DC0E7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApiTest", "ApiTest\ApiTest.vcxproj", "{F06AA133-65D9-430E-BCB6-9183B754C258}"
+	ProjectSection(ProjectDependencies) = postProject
+		{493DDF50-624F-48BB-B8D9-39221C41999E} = {493DDF50-624F-48BB-B8D9-39221C41999E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

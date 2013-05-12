@@ -164,7 +164,7 @@ typedef int BOOL;
 #endif
 
 #include <windows.h>		/* Windows header */
-#include <commctrl.h>		/* The common controls */
+//#include <commctrl.h>		/* The common controls */
 #include <process.h>		/* Process control */
 #include <winioctl.h>
 #include <stdio.h>		/* For sprintf */

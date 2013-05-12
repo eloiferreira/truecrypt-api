@@ -28,7 +28,7 @@ extern "C" {
 
 #if defined(_WIN32) && !defined(TC_WINDOWS_DRIVER)
 
-	BOOL CheckPasswordLength (HWND hwndDlg, HWND hwndItem);		
+	BOOL ValidatePassword(const char *szPassword, const char *szVerify, BOOL keyFilesEnabled);
 	BOOL CheckPasswordCharEncoding (HWND hPassword, Password *ptrPw);			
 	int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, int pkcs5, HWND hwndDlg);
 

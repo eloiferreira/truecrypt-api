@@ -15,51 +15,73 @@ governed by license terms which are TBD. */
 #include "Random.h"
 #include "Options.h"
 #include "Uac.h"
+#include "Errors.h"
 
 #include <io.h>
 
-BOOL ValidatePassword(unsigned char *szPassword, unsigned char *szVerify, BOOL keyFilesEnabled) {
+BOOL IsPageLocked(LPVOID pRef, SIZE_T dwSize) {
+
+	int res = VirtualUnlock(pRef, dwSize);
+	if (res == 0) {
+		int err = GetLastError();
+		if (err == ERROR_NOT_LOCKED) {
+			SetLastError(TCAPI_E_PAGE_NOT_LOCKED);
+			return FALSE;
+		}
+	}
+	if (!VirtualLock(pRef, dwSize)) {
+		//TODO: might supply original GetLastError() value for debug here
+		SetLastError(TCAPI_E_PAGE_CANT_LOCK);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL ValidatePassword(const char *szPassword, const char *szVerify, BOOL keyFilesEnabled) {
 	/* TrueCrypt tries to make password handling more secure through using locked VM pages and 
 	not making any text copies other than in stack with subsequent burn. We here are in a dll so 
 	we dont know where the password came from and how securely its handled by the application.
 	We can impose a requirement to pass the password here on a locked page and check if it's indeed 
-	locked. At lease this would require some effort on behalf of developer and might also keep him 
+	locked. At least this would require some effort on behalf of developer and might also keep him 
 	from unnecessarily multiplying copies of the password. Since I couldn't find a straight way 
-	to check if a page is locked (though there is gotta be one), here is a feeble attempt to infer
-	it while unlocking, which removes the page from working set and it *might* theoretically get 
-	paged before we lock it again. This is completely speculative and needs checking though. */
-}
+	to check if a page is locked from user mode (a driver can check for MDL_PAGES_LOCKED), here is 
+	a feeble attempt to infer it while unlocking, which removes the page from working set and it 
+	*might* theoretically get paged before we lock it again. This is completely speculative though.
+	Perhaps more appropriate way would be to provide an AllocatePassword routine which does it the 
+	right way so the user wouldn't have to care about the details. */
 
-BOOL VerifyPasswordAndUpdate (unsigned char *szPassword, char *szVerify, BOOL keyFilesEnabled)
-{
-	char szTmp1[MAX_PASSWORD + 1];
-	char szTmp2[MAX_PASSWORD + 1];
-	int k = GetWindowTextLength (hPassword);
-	BOOL bEnable = FALSE;
+	int lenPass, lenVerify = 0;
 
-	GetWindowText (hPassword, szTmp1, sizeof (szTmp1));
-	GetWindowText (hVerify, szTmp2, sizeof (szTmp2));
+	lenPass = strlen(szPassword);
+	lenVerify = strlen(szVerify);
 
-	if (strcmp (szTmp1, szTmp2) != 0)
-		bEnable = FALSE;
-	else
-	{
-		if (k >= MIN_PASSWORD || keyFilesEnabled)
-			bEnable = TRUE;
-		else
-			bEnable = FALSE;
+	if (!IsPageLocked((LPVOID)szPassword, lenPass) || !IsPageLocked((LPVOID)szVerify, lenVerify)) {
+		//TODO: DOC -> See GetLastError()
+		return FALSE;
 	}
 
-	if (szPassword != NULL)
-		memcpy (szPassword, szTmp1, sizeof (szTmp1));
+	if (lenPass != lenVerify) {
+		SetLastError(TCAPI_E_PASS_LENGTH_NOT_EQUAL);
+		return FALSE;
+	}
 
-	if (szVerify != NULL)
-		memcpy (szVerify, szTmp2, sizeof (szTmp2));
+	if ((lenPass < MIN_PASSWORD) && !keyFilesEnabled) {
+		SetLastError(TCAPI_E_PASS_TOO_SHORT);
+		return FALSE;
+	}
 
-	burn (szTmp1, sizeof (szTmp1));
-	burn (szTmp2, sizeof (szTmp2));
+	if (strcmp(szPassword, szVerify) != 0) {
+		SetLastError(TCAPI_E_PASS_NOT_EQUAL);
+		return FALSE;
+	}
 
-	EnableWindow (hButton, bEnable);
+	if (lenPass < PASSWORD_LEN_WARNING) {
+		SetLastError(TCAPI_W_WEAK_PASSWORD);
+		//TODO: DOC -> Check GetLastError in either case
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 BOOL CheckPasswordCharEncoding (HWND hPassword, Password *ptrPw)
@@ -100,19 +122,6 @@ BOOL CheckPasswordCharEncoding (HWND hPassword, Password *ptrPw)
 			return FALSE; 
 	}
 
-	return TRUE;
-}
-
-
-BOOL CheckPasswordLength (HWND hwndDlg, HWND hwndItem)
-{
-	if (GetWindowTextLength (hwndItem) < PASSWORD_LEN_WARNING)
-	{
-#ifndef _DEBUG
-		if (MessageBoxW (hwndDlg, GetString ("PASSWORD_LENGTH_WARNING"), lpszTitle, MB_YESNO|MB_ICONWARNING|MB_DEFBUTTON2) != IDYES)
-			return FALSE;
-#endif
-	}
 	return TRUE;
 }
 
