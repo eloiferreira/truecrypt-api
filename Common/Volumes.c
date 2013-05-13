@@ -677,11 +677,6 @@ ret:
 
 #if !defined (DEVICE_DRIVER) && !defined (TC_WINDOWS_BOOT)
 
-#ifdef VOLFORMAT
-#	include "../Format/TcFormat.h"
-#	include "Dlgcode.h"
-#endif
-
 // Creates a volume header in memory
 int CreateVolumeHeaderInMemory (BOOL bBoot, char *header, int ea, int mode, Password *password,
 		   int pkcs5_prf, char *masterKeydata, PCRYPTO_INFO *retInfo,
