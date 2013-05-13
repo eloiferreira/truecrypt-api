@@ -77,15 +77,15 @@
       <ErrorReporting>Prompt</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;setupapi.lib;version.lib;..\Crypto\Debug\crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\Crypto\Debug\Crypto.lib;advapi32.lib;user32.lib;shell32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)TrueCryptApi.dll</OutputFile>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>api.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,6 +119,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Apidrvr.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\Crc.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
@@ -126,6 +129,9 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\EncryptionThreadPool.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\Common\Endian.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Errors.c">
@@ -158,6 +164,9 @@
     <ClCompile Include="..\Common\Volumes.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\Wipe.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\Xts.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
@@ -176,9 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Apidrvr.h" />
+    <ClInclude Include="..\Common\BootDefs.h" />
     <ClInclude Include="..\Common\Crc.h" />
     <ClInclude Include="..\Common\Crypto.h" />
     <ClInclude Include="..\Common\EncryptionThreadPool.h" />
+    <ClInclude Include="..\Common\Endian.h" />
     <ClInclude Include="..\Common\Errors.h" />
     <ClInclude Include="..\Common\GfMul.h" />
     <ClInclude Include="..\Common\Options.h" />
@@ -190,6 +201,7 @@
     <ClInclude Include="..\Common\Tcdefs.h" />
     <ClInclude Include="..\Common\Uac.h" />
     <ClInclude Include="..\Common\Volumes.h" />
+    <ClInclude Include="..\Common\Wipe.h" />
     <ClInclude Include="..\Common\Xts.h" />
     <ClInclude Include="Api.h" />
   </ItemGroup>

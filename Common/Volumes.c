@@ -33,6 +33,7 @@
 #include "Volumes.h"
 #include "Pkcs5.h"
 #include "Strings.h"
+#include "Apidrvr.h"
 
 /* Volume header v5 structure (used since TrueCrypt 7.0): */
 //

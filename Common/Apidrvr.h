@@ -9,11 +9,11 @@
  contained in the file License.txt included in TrueCrypt binary and source
  code distribution packages. */
 
-#pragma once
+#ifndef APIDRVR_H
+#define APIDRVR_H
 
 #include "Tcdefs.h"
-#include "Boot/Windows/BootDefs.h"
-#include "Common.h"
+#include "BootDefs.h"
 #include "Crypto.h"
 #include "Volumes.h"
 #include "Wipe.h"
@@ -314,4 +314,20 @@ typedef struct
 #define TC_DRIVER_CONFIG_DISABLE_NONADMIN_SYS_FAVORITES_ACCESS		0x4
 #define TC_DRIVER_CONFIG_DISABLE_HARDWARE_ENCRYPTION				0x8
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	/* Handle to the device driver */
+	extern HANDLE hDriver;
+	
+	int DriverAttach (void);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif		/* _WIN32 */
+
+#endif /* APIDRVR_H */

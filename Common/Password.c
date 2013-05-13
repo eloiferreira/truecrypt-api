@@ -86,7 +86,7 @@ BOOL ValidatePassword(const char *szPassword, const char *szVerify, BOOL keyFile
 
 BOOL CheckPasswordCharEncoding (HWND hPassword, Password *ptrPw)
 {
-	int i, len;
+	int i, len = 0;
 	
 	if (hPassword == NULL)
 	{
@@ -103,12 +103,14 @@ BOOL CheckPasswordCharEncoding (HWND hPassword, Password *ptrPw)
 	else
 	{
 		wchar_t s[MAX_PASSWORD + 1];
-		len = GetWindowTextLength (hPassword);
+		//TODO:
+		//len = GetWindowTextLength (hPassword);
 
 		if (len > MAX_PASSWORD)
 			return FALSE; 
 
-		GetWindowTextW (hPassword, s, sizeof (s) / sizeof (wchar_t));
+		//TODO:
+		//GetWindowTextW (hPassword, s, sizeof (s) / sizeof (wchar_t));
 
 		for (i = 0; i < len; i++)
 		{
@@ -254,7 +256,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 		}
 
 		/* Read in volume header */
-		if (!ReadEffectiveVolumeHeader (bDevice, dev, buffer, &bytesRead))
+		if (!ReadEffectiveVolumeHeader (bDevice, dev, (byte *)buffer, &bytesRead))
 		{
 			nStatus = ERR_OS_ERROR;
 			goto error;
@@ -339,7 +341,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 				cryptoInfo->mode,
 				newPassword,
 				cryptoInfo->pkcs5,
-				cryptoInfo->master_keydata,
+				(char *)cryptoInfo->master_keydata,
 				&ci,
 				cryptoInfo->VolumeSize.Value,
 				(volumeType == TC_VOLUME_TYPE_HIDDEN || volumeType == TC_VOLUME_TYPE_HIDDEN_LEGACY) ? cryptoInfo->hiddenVolumeSize : 0,
@@ -362,7 +364,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 				goto error;
 			}
 
-			if (!WriteEffectiveVolumeHeader (bDevice, dev, buffer))
+			if (!WriteEffectiveVolumeHeader (bDevice, dev, (byte *)buffer))
 			{
 				nStatus = ERR_OS_ERROR;
 				goto error;

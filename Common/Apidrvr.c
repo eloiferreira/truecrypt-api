@@ -5,29 +5,15 @@ Modifications and additions to the original source code (contained in this file)
 and all other portions of this file are Copyright (c) 2013 Nic Nilov and are 
 governed by license terms which are TBD. */
 
-#include "Strings.h"
-#include <string.h>
-#include <ctype.h>
+#include "Apidrvr.h"
 
-void LowerCaseCopy (char *lpszDest, const char *lpszSource)
-{
-	int i = strlen (lpszSource);
+#ifdef _WIN32
 
-	lpszDest[i] = 0;
-	while (--i >= 0)
-	{
-		lpszDest[i] = (char) tolower (lpszSource[i]);
-	}
+/* Handle to the device driver */
+HANDLE hDriver = INVALID_HANDLE_VALUE;
 
+int DriverAttach (void) {
+	return 0;
 }
 
-void UpperCaseCopy (char *lpszDest, const char *lpszSource)
-{
-	int i = strlen (lpszSource);
-
-	lpszDest[i] = 0;
-	while (--i >= 0)
-	{
-		lpszDest[i] = (char) toupper (lpszSource[i]);
-	}
-}
+#endif /* _WIN32 */

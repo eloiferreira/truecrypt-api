@@ -12,6 +12,7 @@
 #include "Tcdefs.h"
 #include "Crc.h"
 #include "Random.h"
+#include "Errors.h"
 
 static unsigned __int8 buffer[RNG_POOL_SIZE];
 static unsigned char *pRandPool = NULL;
@@ -55,7 +56,7 @@ CRITICAL_SECTION critRandProt;	/* The critical section */
 BOOL volatile bThreadTerminate = FALSE;	/* This variable is shared among thread's so its made volatile */
 
 /* Network library handle for the SlowPoll function */
-HANDLE hNetAPI32 = NULL;
+HMODULE hNetAPI32 = NULL;
 
 // CryptoAPI
 BOOL CryptoAPIAvailable = FALSE;
@@ -89,12 +90,12 @@ int Randinit ()
 	}
 
 	hKeyboard = SetWindowsHookEx (WH_KEYBOARD, (HOOKPROC)&KeyboardProc, NULL, GetCurrentThreadId ());
-	if (hKeyboard == 0) handleWin32Error (0);
+	if (hKeyboard == 0) handleWin32Error ();
 
 	hMouse = SetWindowsHookEx (WH_MOUSE, (HOOKPROC)&MouseProc, NULL, GetCurrentThreadId ());
 	if (hMouse == 0)
 	{
-		handleWin32Error (0);
+		handleWin32Error ();
 		goto error;
 	}
 
@@ -308,7 +309,7 @@ BOOL RandpeekBytes (unsigned char *buf, int len)
 
 	if (len > RNG_POOL_SIZE)
 	{
-		Error ("ERR_NOT_ENOUGH_RANDOM_DATA");	
+		SetLastError(TCAPI_E_NOT_ENOUGH_RANDOM_DATA);
 		len = RNG_POOL_SIZE;
 	}
 
@@ -345,7 +346,7 @@ BOOL RandgetBytes (unsigned char *buf, int len, BOOL forceSlowPoll)
 	/* There's never more than RNG_POOL_SIZE worth of randomess */
 	if (len > RNG_POOL_SIZE)
 	{
-		Error ("ERR_NOT_ENOUGH_RANDOM_DATA");	
+		SetLastError(TCAPI_E_NOT_ENOUGH_RANDOM_DATA);
 		len = RNG_POOL_SIZE;
 		return FALSE;
 	}
@@ -776,7 +777,9 @@ void UserEnrichRandomPool (HWND hwndDlg)
 
 	if (!IsRandomPoolEnrichedByUser())
 	{
-		INT_PTR result = DialogBoxParamW (hInst, MAKEINTRESOURCEW (IDD_RANDOM_POOL_ENRICHMENT), hwndDlg ? hwndDlg : MainDlg, (DLGPROC) RandomPoolEnrichementDlgProc, (LPARAM) 0);
+		INT_PTR result = 0;
+		//TODO:
+		//INT_PTR result = DialogBoxParamW (hInst, MAKEINTRESOURCEW (IDD_RANDOM_POOL_ENRICHMENT), hwndDlg ? hwndDlg : MainDlg, (DLGPROC) RandomPoolEnrichementDlgProc, (LPARAM) 0);
 		SetRandomPoolEnrichedByUserStatus (result == IDOK);
 	}
 }
