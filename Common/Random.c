@@ -56,7 +56,7 @@ CRITICAL_SECTION critRandProt;	/* The critical section */
 BOOL volatile bThreadTerminate = FALSE;	/* This variable is shared among thread's so its made volatile */
 
 /* Network library handle for the SlowPoll function */
-HMODULE hNetAPI32 = NULL;
+HANDLE hNetAPI32 = NULL;
 
 // CryptoAPI
 BOOL CryptoAPIAvailable = FALSE;

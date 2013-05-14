@@ -341,7 +341,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 				cryptoInfo->mode,
 				newPassword,
 				cryptoInfo->pkcs5,
-				(char *)cryptoInfo->master_keydata,
+				cryptoInfo->master_keydata,
 				&ci,
 				cryptoInfo->VolumeSize.Value,
 				(volumeType == TC_VOLUME_TYPE_HIDDEN || volumeType == TC_VOLUME_TYPE_HIDDEN_LEGACY) ? cryptoInfo->hiddenVolumeSize : 0,
