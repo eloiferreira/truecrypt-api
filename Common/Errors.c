@@ -11,29 +11,30 @@ governed by license terms which are TBD. */
 #include "Errors.h"
 #include "Uac.h"
 
-DWORD handleWin32Error ()
+void handleWin32Error ()
 {
 	DWORD dwError = GetLastError ();
 
 	// Access denied
 	if (dwError == ERROR_ACCESS_DENIED && !IsAdmin ())
 	{
-		SetLastError (dwError);			// Preserve the original error code after IsAdmin
-		return TCAPI_E_ACCESS_DENIED;
+		SetLastError(TCAPI_E_ACCESS_DENIED);
+		return;
 	}
 
 	// Api-friendly hardware error explanation
-	if (IsDiskError (dwError))
-		return MAKE_DISK_ERROR(dwError);
+	if (IsDiskError (dwError)) {
+		SetLastError(MAKE_DISK_ERROR(dwError));
+		return;
+	}
 
 	// Device not ready
 	if (dwError == ERROR_NOT_READY) {
-		DWORD res = HandleDriveNotReadyError(dwError);
-		SetLastError (dwError);				// Preserve the original error code
-		return res;
+		SetLastError(HandleDriveNotReadyError(dwError));
+		return;
 	}
 
-	return MAKE_WINDOWS_ERROR(dwError);
+	SetLastError(MAKE_WINDOWS_ERROR(dwError));
 }
 
 BOOL IsDiskError (DWORD error)

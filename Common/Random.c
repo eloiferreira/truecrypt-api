@@ -45,7 +45,6 @@ void RandAddInt (unsigned __int32 x)
 }
 
 #include <tlhelp32.h>
-//#include "Dlgcode.h" TCAPI: commented
 
 HHOOK hMouse = NULL;		/* Mouse hook for the random number generator */
 HHOOK hKeyboard = NULL;		/* Keyboard hook for the random number generator */

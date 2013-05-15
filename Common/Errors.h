@@ -87,6 +87,7 @@ should reuse appropriate system-defined facility*/
 #define TCAPI_E_PASS_TOO_SHORT			MAKE_TCAPI_ERROR(8)
 #define TCAPI_E_PASS_NOT_EQUAL			MAKE_TCAPI_ERROR(9)
 #define TCAPI_E_NOT_ENOUGH_RANDOM_DATA	MAKE_TCAPI_ERROR(10)
+#define TCAPI_E_NOT_INITIALIZED			MAKE_TCAPI_ERROR(11)
 
 #define TCAPI_W_AUTOMOUNT_DISABLED		MAKE_TCAPI_WARNING(1)
 #define TCAPI_W_ASSIGN_DRIVE_LETTER		MAKE_TCAPI_WARNING(2)
@@ -100,7 +101,7 @@ should reuse appropriate system-defined facility*/
 extern "C" {
 #endif
 
-	DWORD handleWin32Error();
+	void handleWin32Error();
 	BOOL IsDiskError (DWORD error);
 	BOOL IsDiskReadError (DWORD error);
 	BOOL IsDiskWriteError (DWORD error);

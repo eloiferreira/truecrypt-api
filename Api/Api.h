@@ -11,6 +11,8 @@
 #include <windows.h>
 #include <winver.h>
 
+extern BOOL bTcApiInitialized;
+
 #define DLLEXPORT __declspec(dllexport)
 
 #ifdef __cplusplus
