@@ -23,8 +23,8 @@ For big-endian platforms define BYTE_ORDER as BIG_ENDIAN. */
 #	include <memory.h>
 #endif
 
+#include "Errors.h"
 #include "Xts.h"
-
 
 #ifndef TC_NO_COMPILER_INT64
 

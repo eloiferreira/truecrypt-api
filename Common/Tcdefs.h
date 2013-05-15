@@ -125,7 +125,7 @@ void ThrowFatalException (int line);
 #elif defined (TC_WINDOWS_DRIVER)
 #	define TC_THROW_FATAL_EXCEPTION KeBugCheckEx (SECURITY_SYSTEM, __LINE__, 0, 0, 'TC')
 #else
-#	define TC_THROW_FATAL_EXCEPTION	*(char *) 0 = 0
+// moved to Errors.h
 #endif
 
 #ifdef TC_WINDOWS_DRIVER

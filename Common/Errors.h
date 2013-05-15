@@ -11,6 +11,9 @@ governed by license terms which are TBD. */
 #include <windows.h>
 #include <winerror.h>
 
+//TODO: To be replaced with proper error handling
+#define TC_THROW_FATAL_EXCEPTION	*(char *) 0 = 0
+
 #define STATUS_SEVERITY_SUCCESS			0x0UL
 #define STATUS_SEVERITY_INFORMATIONAL	0x1UL
 #define STATUS_SEVERITY_WARNING			0x2UL

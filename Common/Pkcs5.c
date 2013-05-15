@@ -9,7 +9,7 @@
  contained in the file License.txt included in TrueCrypt binary and source
  code distribution packages. */
 
-#include "Tcdefs.h"
+//#include "Tcdefs.h"
 
 #include <memory.h>
 #include "Rmd160.h"
@@ -20,6 +20,7 @@
 #endif
 #include "Pkcs5.h"
 #include "Crypto.h"
+#include "Errors.h"
 
 void hmac_truncate
   (

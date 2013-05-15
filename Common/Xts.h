@@ -11,9 +11,10 @@
 
 // Header files (optional)
 
-#include "Tcdefs.h"
+//#include "Tcdefs.h" //NN: Was used for TC_THROW_FATAL_EXCEPTION only.
 #include "Common/Endian.h"
 #include "Crypto.h"
+
 
 #ifdef __cplusplus
 extern "C" {

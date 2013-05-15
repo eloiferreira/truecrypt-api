@@ -6,6 +6,7 @@
  packages.
 */
 
+#include "Errors.h"
 #include "EncryptionThreadPool.h"
 #include "Pkcs5.h"
 #ifdef DEVICE_DRIVER

@@ -6,9 +6,8 @@
  packages.
 */
 
-#include "Tcdefs.h"
 #include "Wipe.h"
-
+#include "Errors.h"
 
 static BOOL Wipe1PseudoRandom (int pass, byte *buffer, size_t size)
 {

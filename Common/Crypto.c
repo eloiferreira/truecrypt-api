@@ -9,7 +9,8 @@
  contained in the file License.txt included in TrueCrypt binary and source
  code distribution packages. */
 
-#include "Tcdefs.h"
+//#include "Tcdefs.h"	//NN:Was used for TC_THROW_FATAL_EXCEPTION only.
+#include "Errors.h"
 #include "Crypto.h"
 #include "Xts.h"
 #include "Crc.h"

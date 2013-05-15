@@ -41,12 +41,15 @@ BOOL ValidatePassword(const char *szPassword, const char *szVerify, BOOL keyFile
 	/* TrueCrypt tries to make password handling more secure through using locked VM pages and 
 	not making any text copies other than in stack with subsequent burn. We here are in a dll so 
 	we dont know where the password came from and how securely its handled by the application.
+	
 	We can impose a requirement to pass the password here on a locked page and check if it's indeed 
-	locked. At least this would require some effort on behalf of developer and might also keep him 
-	from unnecessarily multiplying copies of the password. Since I couldn't find a straight way 
-	to check if a page is locked from user mode (a driver can check for MDL_PAGES_LOCKED), here is 
-	a feeble attempt to infer it while unlocking, which removes the page from working set and it 
-	*might* theoretically get paged before we lock it again. This is completely speculative though.
+	locked so that later we could securely erase values from memory. This at least would require 
+	some conscious approach on behalf of developer and might also keep him from unnecessarily 
+	multiplying copies of the password. Since I couldn't find a straight way to check if a page 
+	is locked from user mode (a driver can check for MDL_PAGES_LOCKED), here is a feeble attempt 
+	to infer it while unlocking, which removes the page from working set and it *might* 
+	theoretically get paged before we lock it again. This is completely speculative though.
+	
 	Perhaps more appropriate way would be to provide an AllocatePassword routine which does it the 
 	right way so the user wouldn't have to care about the details. */
 
@@ -327,10 +330,9 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 		/* NN: Gutmann specifically says here: http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html#Epilogue 
 		that 35 times in reality is never needed, and, most importantly, current high-density technology
 		on disk hdd media would not reallistically allow to recover any data even after only 'a few passes of 
-		random scrubbing' rewrites. Flash media, SSD drives are whole another story. Here is another his 
-		article on this topic: http://www.cypherpunks.to/~peter/usenix01.pdf. This said not to diminish 
-		TrueCrypt effort to practice most stringent approach on security, but just to keep in mind a correct 
-		perspective on the topic. */
+		random scrubbing'. Flash media, SSD drives are whole another story. Here is his article on this 
+		topic: http://www.cypherpunks.to/~peter/usenix01.pdf. This said not to diminish TrueCrypt effort 
+		to practice most stringent approach on security, but just to keep a correct perspective on the topic. */
 
 		for (wipePass = 0; wipePass < PRAND_DISK_WIPE_PASSES; wipePass++)
 		{

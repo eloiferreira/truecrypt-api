@@ -9,7 +9,7 @@
 #ifndef TC_HEADER_ENCRYPTION_THREAD_POOL
 #define TC_HEADER_ENCRYPTION_THREAD_POOL
 
-#include "Tcdefs.h"
+//#include "Tcdefs.h" //NN: Was used for TC_THROW_FATAL_EXCEPTION only.
 #include "Crypto.h"
 
 #ifdef __cplusplus
