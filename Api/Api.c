@@ -5,12 +5,18 @@
 
 #include "Api.h"
 #include "Errors.h"
+#include "Options.h"
 
 BOOL bTcApiInitialized = FALSE;
 
-#define TCAPI_CHECK_INITIALIZED(...) do { if (!bTcApiInitialized) { SetLastError(TCAPI_E_NOT_INITIALIZED); return __VA_ARGS__; } } while (0)
+#define TCAPI_CHECK_INITIALIZED(RESULT) do { if (!bTcApiInitialized) { SetLastError(TCAPI_E_NOT_INITIALIZED); return RESULT; } } while (0)
 
-DLLEXPORT BOOL APIENTRY Initialize() {
+DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
+
+	if (!options || !ApplyOptions(options)) {
+		//TODO: Doc -> See GetLastError()
+		return FALSE;
+	}
 
 	bTcApiInitialized = TRUE;
 	return bTcApiInitialized;

@@ -2,30 +2,34 @@
 //
 
 #include "stdafx.h"
+#include "..\Common\Options.h"
+
 using namespace std;
 
-typedef int (STDMETHODCALLTYPE *LTCD)();
+typedef BOOL (STDMETHODCALLTYPE *PINITIALIZE)(PTCAPI_OPTIONS options);
+typedef int (STDMETHODCALLTYPE *PLOAD_TC_DRIVER)();
 
 class ApiTest {
 private:
 	HMODULE hApiDll;
-	LTCD LoadTrueCryptDriver;
+	PLOAD_TC_DRIVER LoadTrueCryptDriver;
+	PINITIALIZE Initialize;
 protected:
 	BOOL LoadTrueCryptApi(LPCTSTR path) {
-		wcout << "Loading TrueCrypt API dll from " << path << " \n";
+		wcout << "Loading TrueCrypt API dll from " << path << endl;
 		hApiDll = LoadLibrary(path);
 		if (!hApiDll) {
-			cout << "Error loading TrueCrypt API dll: " << GetLastError() << "\n";
+			cout << "Error loading TrueCrypt API dll: " << GetLastError() << endl;
 		} else {
-			cout << "Loaded\n";
+			cout << "Loaded successfully" << endl;
 		}
 		return (BOOL) hApiDll;
 	}
 
 	BOOL UnloadTrueCryptApi() {
-		cout << "Unloading TrueCrypt API dll \n";
+		cout << "Unloading TrueCrypt API dll" << endl;
 		if (!hApiDll) {
-			cout << "TrueCryptApi dll has not been initialized\n";
+			cout << "TrueCryptApi dll has not been initialized" << endl;
 			return FALSE;
 		}
 
@@ -34,35 +38,48 @@ protected:
 			cout << "Unloaded\n";
 			return TRUE;
 		} else {
-			cout << "Error unloading TrueCrypt API dll: " << GetLastError() << "\n";
+			cout << "Error unloading TrueCrypt API dll: " << GetLastError() << endl;
 			return FALSE;
 		}
 	}
 
 	BOOL GetApiAddresses() {
-		cout << "Getting API addresses\n";
+		cout << "Getting API addresses" << endl;
 		if (!hApiDll) {
-			cout << "TrueCryptApi dll has not been initialized\n";
+			cout << "TrueCryptApi dll has not been initialized" << endl;
 			return FALSE;
 		}
 
-		LoadTrueCryptDriver = (LTCD) GetProcAddress(hApiDll, "LoadTrueCryptDriver");
-		if (!LoadTrueCryptDriver) {
-			cout << "Error getting address of LoadTrueCryptDriver: " << GetLastError() << "\n";
-			return FALSE;
-		} else {
-			cout << "LoadTrueCryptDriver is loaded at: " << LoadTrueCryptDriver << "\n";
-		}
+		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
+		LoadProcAddress((FARPROC *)&Initialize, "Initialize");
+
+		//Initialize = (PINITIALIZE) GetProcAddress(hApiDll, "Initialize");
+		//LoadTrueCryptDriver = (PLOAD_TC_DRIVER) GetProcAddress(hApiDll, "LoadTrueCryptDriver");
+
 		return TRUE;
+	}
+
+	void LoadProcAddress(FARPROC *proc, char *name) {
+		*proc = GetProcAddress(hApiDll, name);
+		if (!proc) {
+			cout << "Error getting address of " << name << ": " << GetLastError() << endl;
+			return;
+		} else {
+			cout << name << " loaded at: " << proc << endl;
+		}
 	}
 
 public:
 	void run() {
 		if (!LoadTrueCryptApi(L"TrueCryptApi.dll")) return;
 		if (GetApiAddresses()) {
-			cout << "Loading TrueCrypt Driver\n";
+			cout << "Initializing" << endl;
+			Initialize(NULL);
+			cout << "Initialize returned " << endl;
+			
+			cout << "Loading TrueCrypt Driver" << endl;
 			int res = LoadTrueCryptDriver();
-			cout << "LoadTrueCryptDriver returned " << res << "\n";
+			cout << "LoadTrueCryptDriver returned " << res << endl;
 		}
 		UnloadTrueCryptApi();
 	}

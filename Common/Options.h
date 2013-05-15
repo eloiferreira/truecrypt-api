@@ -8,14 +8,37 @@ governed by license terms which are TBD. */
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#define TC_OPTION_BASE					0x800
+#define TC_OPTION_CACHE_PASSWORDS		TC_OPTION_BASE + 1
+#define TC_OPTION_MOUNT_READONLY		TC_OPTION_BASE + 2
+#define TC_OPTION_MOUNT_REMOVABLE		TC_OPTION_BASE + 3
+#define TC_OPTION_PRESERVE_TIMESTAMPS	TC_OPTION_BASE + 4
+#define TC_OPTION_HIDDEN_SECTOR_STATUS	TC_OPTION_BASE + 5
+#define TC_OPTION_USE_KEYFILES			TC_OPTION_BASE + 6
+#define TC_OPTION_MOUNT_CLOSE_SESSIONS	TC_OPTION_BASE + 7
+#define TC_OPTION_TOKEN_LIBRARY			TC_OPTION_BASE + 8
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+	typedef struct {
+		DWORD OptionId;
+		DWORD OptionValue;
+	} TCAPI_OPTION, *PTCAPI_OPTION;
+
+	typedef struct {
+		DWORD NumberOfOptions;
+		TCAPI_OPTION Options[];
+	} TCAPI_OPTIONS, *PTCAPI_OPTIONS;
+
 	extern BOOL bPreserveTimestamp;
+
+	BOOL ApplyOptions(PTCAPI_OPTIONS options);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
