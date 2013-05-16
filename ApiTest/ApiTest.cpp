@@ -53,9 +53,6 @@ protected:
 		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
 		LoadProcAddress((FARPROC *)&Initialize, "Initialize");
 
-		//Initialize = (PINITIALIZE) GetProcAddress(hApiDll, "Initialize");
-		//LoadTrueCryptDriver = (PLOAD_TC_DRIVER) GetProcAddress(hApiDll, "LoadTrueCryptDriver");
-
 		return TRUE;
 	}
 
