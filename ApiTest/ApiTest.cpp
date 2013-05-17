@@ -66,14 +66,35 @@ protected:
 		}
 	}
 
+	void RunInitialize() {
+		PTCAPI_OPTIONS pOptions;
+		pOptions = (PTCAPI_OPTIONS) malloc(sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * 4));
+		
+		pOptions->Options[0].OptionId = TC_OPTION_PRESERVE_TIMESTAMPS;
+		pOptions->Options[0].OptionValue = TRUE;
+
+		pOptions->Options[1].OptionId = TC_OPTION_CACHE_PASSWORDS;
+		pOptions->Options[1].OptionValue = TRUE;
+
+		pOptions->Options[2].OptionId = TC_OPTION_MOUNT_READONLY;
+		pOptions->Options[2].OptionValue = TRUE;
+
+		pOptions->Options[3].OptionId = TC_OPTION_MOUNT_REMOVABLE;
+		pOptions->Options[3].OptionValue = TRUE;
+
+		pOptions->NumberOfOptions = 4;
+
+		cout << "Initializing" << endl;
+		Initialize(pOptions);
+		cout << "Initialize returned " << endl;
+	}
+
 public:
 	void run() {
 		if (!LoadTrueCryptApi(L"TrueCryptApi.dll")) return;
 		if (GetApiAddresses()) {
-			cout << "Initializing" << endl;
-			Initialize(NULL);
-			cout << "Initialize returned " << endl;
-			
+			RunInitialize();
+
 			cout << "Loading TrueCrypt Driver" << endl;
 			int res = LoadTrueCryptDriver();
 			cout << "LoadTrueCryptDriver returned " << res << endl;
