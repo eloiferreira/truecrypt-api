@@ -68,7 +68,10 @@ protected:
 
 	void RunInitialize() {
 		PTCAPI_OPTIONS pOptions;
-		pOptions = (PTCAPI_OPTIONS) malloc(sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * 4));
+		DWORD memSize = sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * 4);
+
+		pOptions = (PTCAPI_OPTIONS) malloc(memSize);
+		memset(pOptions, 0, memSize);
 		
 		pOptions->Options[0].OptionId = TC_OPTION_PRESERVE_TIMESTAMPS;
 		pOptions->Options[0].OptionValue = TRUE;
@@ -85,8 +88,11 @@ protected:
 		pOptions->NumberOfOptions = 4;
 
 		cout << "Initializing" << endl;
-		Initialize(pOptions);
-		cout << "Initialize returned " << endl;
+		BOOL res = Initialize(pOptions);
+		
+		free(pOptions);
+		
+		cout << "Initialize returned " << res << endl;
 	}
 
 public:
