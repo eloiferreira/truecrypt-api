@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <winver.h>
 
-extern BOOL bTcApiInitialized;
+#include "Options.h"
 
 #define DLLEXPORT __declspec(dllexport)
 
@@ -19,7 +19,11 @@ extern BOOL bTcApiInitialized;
 extern "C" {
 #endif
 
-DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
+	extern BOOL bTcApiInitialized;
+
+	DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options);
+	DLLEXPORT BOOL APIENTRY Shutdown();
+	DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
 
 #ifdef __cplusplus
 }

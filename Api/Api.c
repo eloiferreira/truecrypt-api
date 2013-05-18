@@ -1,11 +1,10 @@
 // Api.c : Defines the exported functions for the DLL application.
 //
 
-#include "Tcdefs.h"
-
 #include "Api.h"
 #include "Errors.h"
-#include "Options.h"
+#include "OsInfo.h"
+#include "EncryptionThreadPool.h"
 
 BOOL bTcApiInitialized = FALSE;
 
@@ -18,8 +17,24 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 		return FALSE;
 	}
 
+	if (!EncryptionThreadPoolStart (ReadEncryptionThreadPoolFreeCpuCountLimit()))
+	{
+		//TODO: Doc -> See GetLastError()
+		SetLastError(TCAPI_E_CANT_START_ENCPOOL);
+		return FALSE;
+	}
+
 	bTcApiInitialized = TRUE;
 	return bTcApiInitialized;
+}
+
+DLLEXPORT BOOL APIENTRY Shutdown() {
+
+	//returns FALSE if not initialized
+	TCAPI_CHECK_INITIALIZED(0);
+
+	EncryptionThreadPoolStop();
+	return TRUE;
 }
 
 DLLEXPORT int APIENTRY LoadTrueCryptDriver()

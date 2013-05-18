@@ -8,6 +8,8 @@ governed by license terms which are TBD. */
 #ifndef OSINFO_H
 #define OSINFO_H
 
+#include "Tcdefs.h"
+
 #define MIN_MOUNTED_VOLUME_DRIVE_NUMBER ('A' - 'A')
 #define MAX_MOUNTED_VOLUME_DRIVE_NUMBER ('Z' - 'A')
 
@@ -50,6 +52,8 @@ extern "C" {
 	DWORD InitOSVersionInfo ();
 	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
+	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
+	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@
 using namespace std;
 
 typedef BOOL (STDMETHODCALLTYPE *PINITIALIZE)(PTCAPI_OPTIONS options);
+typedef int (STDMETHODCALLTYPE *PSHUTDOWN)();
 typedef int (STDMETHODCALLTYPE *PLOAD_TC_DRIVER)();
 
 class ApiTest {
@@ -14,6 +15,8 @@ private:
 	HMODULE hApiDll;
 	PLOAD_TC_DRIVER LoadTrueCryptDriver;
 	PINITIALIZE Initialize;
+	PSHUTDOWN Shutdown;
+
 protected:
 	BOOL LoadTrueCryptApi(LPCTSTR path) {
 		wcout << "Loading TrueCrypt API dll from " << path << endl;
@@ -29,7 +32,7 @@ protected:
 	BOOL UnloadTrueCryptApi() {
 		cout << "Unloading TrueCrypt API dll" << endl;
 		if (!hApiDll) {
-			cout << "TrueCryptApi dll has not been initialized" << endl;
+			cout << "TrueCryptApi dll has not been loaded" << endl;
 			return FALSE;
 		}
 
@@ -50,8 +53,9 @@ protected:
 			return FALSE;
 		}
 
-		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
 		LoadProcAddress((FARPROC *)&Initialize, "Initialize");
+		LoadProcAddress((FARPROC *)&Shutdown, "Shutdown");
+		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
 
 		return TRUE;
 	}
@@ -95,6 +99,12 @@ protected:
 		cout << "Initialize returned " << res << endl;
 	}
 
+	void RunShutdown() {
+		cout << "Shutting down" << endl;
+		BOOL res = Shutdown();
+		cout << "Shutdown returned " << res << endl;
+	}
+
 public:
 	void run() {
 		if (!LoadTrueCryptApi(L"TrueCryptApi.dll")) return;
@@ -104,6 +114,8 @@ public:
 			cout << "Loading TrueCrypt Driver" << endl;
 			int res = LoadTrueCryptDriver();
 			cout << "LoadTrueCryptDriver returned " << res << endl;
+
+			RunShutdown();
 		}
 		UnloadTrueCryptApi();
 	}

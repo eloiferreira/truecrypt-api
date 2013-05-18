@@ -7,6 +7,7 @@ governed by license terms which are TBD. */
 #include <windows.h>
 #include "OsInfo.h"
 #include "Errors.h"
+#include "Apidrvr.h"
 
 OSVersionEnum nCurrentOS = WIN_UNKNOWN;
 int CurrentOSMajor = 0;
@@ -128,4 +129,33 @@ BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack)
 
 	return ((CurrentOSMajor << 16 | CurrentOSMinor << 8 | CurrentOSServicePack)
 		>= (major << 16 | minor << 8 | reqMinServicePack));
+}
+
+BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
+{
+	HKEY hkey = 0;
+	DWORD size = sizeof (*value);
+	DWORD type;
+
+	if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, subKey, 0, KEY_READ, &hkey) != ERROR_SUCCESS)
+		return FALSE;
+
+	if (RegQueryValueEx (hkey, name, NULL, &type, (BYTE *) value, &size) != ERROR_SUCCESS)
+	{
+		RegCloseKey (hkey);
+		return FALSE;
+	}
+
+	RegCloseKey (hkey);
+	return type == REG_DWORD;
+}
+
+uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ()
+{
+	DWORD count;
+
+	if (!ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", TC_ENCRYPTION_FREE_CPU_COUNT_REG_VALUE_NAME, &count))
+		count = 0;
+
+	return count;
 }
