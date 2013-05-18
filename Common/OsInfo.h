@@ -52,6 +52,7 @@ extern "C" {
 	DWORD InitOSVersionInfo ();
 	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
+	BOOL Is64BitOs ();
 	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
 	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
 

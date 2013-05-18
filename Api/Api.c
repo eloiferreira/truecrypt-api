@@ -5,6 +5,7 @@
 #include "Errors.h"
 #include "OsInfo.h"
 #include "EncryptionThreadPool.h"
+#include "Apidrvr.h"
 
 BOOL bTcApiInitialized = FALSE;
 
@@ -37,12 +38,17 @@ DLLEXPORT BOOL APIENTRY Shutdown() {
 	return TRUE;
 }
 
-DLLEXPORT int APIENTRY LoadTrueCryptDriver()
+DLLEXPORT BOOL APIENTRY LoadTrueCryptDriver()
 {
-	int status = 0;
+	int status = FALSE;
 	
 	TCAPI_CHECK_INITIALIZED(0);
 	
-	status = 42; //DriverAttach();
+	status = DriverAttach ();
+	if (status == FALSE)
+	{
+		//TODO: Doc -> See GetLastError()
+	}
+
 	return status;
 }

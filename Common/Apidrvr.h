@@ -314,14 +314,24 @@ typedef struct
 #define TC_DRIVER_CONFIG_DISABLE_NONADMIN_SYS_FAVORITES_ACCESS		0x4
 #define TC_DRIVER_CONFIG_DISABLE_HARDWARE_ENCRYPTION				0x8
 
+#define TC_MUTEX_NAME_SYSENC				"Global\\TrueCrypt System Encryption Wizard"
+#define TC_MUTEX_NAME_NONSYS_INPLACE_ENC	"Global\\TrueCrypt In-Place Encryption Wizard"
+#define TC_MUTEX_NAME_APP_SETUP				"Global\\TrueCrypt Setup"
+#define TC_MUTEX_NAME_DRIVER_SETUP			"Global\\TrueCrypt Driver Setup"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 	/* Handle to the device driver */
 	extern HANDLE hDriver;
+	extern LONG DriverVersion;
 	
-	int DriverAttach (void);
+	BOOL DriverAttach (void);
+	static int DriverLoad ();
+	BOOL DriverUnload ();
+	int GetDriverRefCount ();
+	BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name);
 
 #ifdef __cplusplus
 }

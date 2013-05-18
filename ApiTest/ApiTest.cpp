@@ -113,7 +113,7 @@ public:
 
 			cout << "Loading TrueCrypt Driver" << endl;
 			int res = LoadTrueCryptDriver();
-			cout << "LoadTrueCryptDriver returned " << res << endl;
+			cout << "LoadTrueCryptDriver returned " << hex << res << endl;
 
 			RunShutdown();
 		}

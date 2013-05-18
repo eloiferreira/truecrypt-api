@@ -131,6 +131,26 @@ BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack)
 		>= (major << 16 | minor << 8 | reqMinServicePack));
 }
 
+BOOL Is64BitOs ()
+{
+	static BOOL isWow64 = FALSE;
+	static BOOL valid = FALSE;
+	typedef BOOL (__stdcall *LPFN_ISWOW64PROCESS ) (HANDLE hProcess,PBOOL Wow64Process);
+	LPFN_ISWOW64PROCESS fnIsWow64Process;
+
+	if (valid)
+		return isWow64;
+
+	fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress (GetModuleHandle("kernel32"), "IsWow64Process");
+
+	if (fnIsWow64Process != NULL)
+		if (!fnIsWow64Process (GetCurrentProcess(), &isWow64))
+			isWow64 = FALSE;
+
+	valid = TRUE;
+	return isWow64;
+}
+
 BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
 {
 	HKEY hkey = 0;
