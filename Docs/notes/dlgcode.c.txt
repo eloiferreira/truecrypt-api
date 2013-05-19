@@ -52,3 +52,12 @@ completely uncalled for. OS info by this time should've been verified and truste
 IsUacSupported
 ======================================================================================================
 Reason for EnableLUA regisry check is unclear. Any (non-embedded) Windows after WIN_VISTA has UAC.
+
+======================================================================================================
+DriverAttach
+======================================================================================================
+while (!CreateDriverSetupMutex ())
+{
+	Sleep (100);	// Wait until the other instance finishes
+}
+will hand if the process holding the mutex misbehaves.
