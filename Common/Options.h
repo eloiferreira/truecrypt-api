@@ -8,6 +8,8 @@ governed by license terms which are TBD. */
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "Wipe.h"
+
 #define TC_OPTION_BASE					0x800
 #define TC_OPTION_CACHE_PASSWORDS		TC_OPTION_BASE + 1
 #define TC_OPTION_MOUNT_READONLY		TC_OPTION_BASE + 2
@@ -17,6 +19,7 @@ governed by license terms which are TBD. */
 #define TC_OPTION_USE_KEYFILES			TC_OPTION_BASE + 6
 #define TC_OPTION_MOUNT_CLOSE_SESSIONS	TC_OPTION_BASE + 7
 #define TC_OPTION_TOKEN_LIBRARY			TC_OPTION_BASE + 8
+#define TC_OPTION_DRIVER_PATH			TC_OPTION_BASE + 9
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +39,7 @@ extern "C" {
 	extern BOOL bCacheInDriver;
 	extern BOOL bMountReadOnly;
 	extern BOOL bMountRemovable;
+	char *lpszDriverPath;
 
 	/* This value may changed only by calling ChangeSystemEncryptionStatus(). Only the wizard can change it
 	(others may still read it though). */

@@ -14,6 +14,12 @@ BOOL bCacheInDriver = FALSE;
 BOOL bMountReadOnly = FALSE;
 BOOL bMountRemovable = FALSE;
 
+/* NN: Path to TrueCrypt driver. If NULL, denotes use of installed driver, otherwise the one at path. 
+Since we load the specified driver only and do not attempt to discover other options, the value of this 
+variable defines whether we are working in portable or installed mode. */
+
+char *lpszDriverPath = NULL;
+
 /* This value may changed only by calling ChangeSystemEncryptionStatus(). Only the wizard can change it
 (others may still read it though). */
 int SystemEncryptionStatus = SYSENC_STATUS_NONE;	
@@ -21,9 +27,10 @@ int SystemEncryptionStatus = SYSENC_STATUS_NONE;
 /* Only the wizard can change this value (others may only read it). */
 WipeAlgorithmId nWipeMode = TC_WIPE_NONE;
 
-
+//TODO: Doc -> options should be freed by caller.
 BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 	int i;
+	DWORD pathSize = 0;
 	PTCAPI_OPTION option = NULL;
 
 	for (i = 0; i < (int) options->NumberOfOptions; i++) {
@@ -42,6 +49,12 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			break;
 		case TC_OPTION_PRESERVE_TIMESTAMPS:
 			bPreserveTimestamp = option->OptionValue;
+			break;
+		case TC_OPTION_DRIVER_PATH:
+			pathSize = (MAX_PATH + 1);
+			lpszDriverPath = malloc(pathSize);
+			memset(lpszDriverPath, 0, (pathSize));
+			strcpy_s(lpszDriverPath, strlen((const char *)option->OptionValue), (const char *) (option->OptionValue));
 			break;
 		default:
 			SetLastError(TCAPI_E_WRONG_OPTION);

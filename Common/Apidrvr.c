@@ -24,78 +24,74 @@ LONG DriverVersion = 0;
 BOOL DriverAttach (void) {
 	/* Try to open a handle to the device driver. It will be closed later. */
 	BOOL res = FALSE;
+	int numTries = 5;
 
-start:
+	/* NN: TrueCrypt attempts to CreateFile() first, and if it fails, acquires the mutex 
+		and moves on with repeated attempts. We acquire mutex first since it should be 
+		available anyway. This allows to keep CreateFile() related processing cleaner. 
+		The counter mitigates possibility to hang if another program misbehaves while
+		keeping the mutex. */
 
-	/* Attempt to load installed driver */
-	hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-
-	if (hDriver == INVALID_HANDLE_VALUE)
-	{
-		//TODO: System encryption and wipe options omitted for now
-		LoadSysEncSettings ();
-
-		if (!CreateDriverSetupMutex ())
-		{
-			// Another instance is already attempting to install, register or start the driver
-
+	while (numTries-- > 0) {
+		if (!CreateDriverSetupMutex ()) {
 			Sleep (100);	// Wait until the other instance finishes
-			
-			while (!CreateDriverSetupMutex ())
-			{
-				Sleep (100);	// Wait until the other instance finishes
-				//TODO: and we'll hang if another app crashes before releasing the mutex
-			}
-
-			// Try to open a handle to the driver again (keep the mutex in case the other instance failed)
-			goto start;
-		}
-		else
-		{
-			// No other instance is currently attempting to install, register or start the driver
-
-			if (SystemEncryptionStatus != SYSENC_STATUS_NONE)
-			{
-				//TODO: Truecrypt here checks for an inconsistent state between config and driver status and 
-				// takes additional actions. We, au contraire, are an applied library in one of possibly 
-				// many TrueCrypt-related  processes, so we have to rely on consistency established by Truecrypt 
-				// application itself. We will take no action to modify system-wide setup.
-
-				CloseDriverSetupMutex ();
-				SetLastError (TCAPI_E_INCONSISTENT_DRIVER_STATE);
-				return FALSE;
-			}
-			else
-			{
-				// Attempt to load the driver (non-install/portable mode)
-				
-				// TODO: Truecrypt tries this several times, in case loaded driver is not of the needed version.
-				// We provide an option for a developer to choose what driver to load, so we'll do exactly that.
-
-				res = DriverLoad ();
-
-				CloseDriverSetupMutex ();
-
-				if (res != ERROR_SUCCESS) 
-					return FALSE;
-
-				bPortableModeConfirmed = TRUE;
-
-				hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-
-				if (hDriver == INVALID_HANDLE_VALUE) {
-					//TODO: Debug output
-					SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
-					return FALSE;
-				}
-				
-				if (bPortableModeConfirmed)
-					NotifyDriverOfPortableMode ();
-			}
+			continue;
 		}
 	}
+	
+	if (!CheckDriverSetupMutex()) {
+		SetLastError(TCAPI_E_CANT_ACQUIRE_DRIVER);
+		return FALSE;
+	}
+	
+	if (lpszDriverPath == NULL) { /* load installed driver */
 
-	CloseDriverSetupMutex ();
+		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+			
+		CloseDriverSetupMutex ();
+			
+		if (hDriver == INVALID_HANDLE_VALUE) {
+
+			/* NN: Truecrypt here checks for an inconsistent state between config and driver status and 
+				takes additional actions. We, au contraire, are an applied library in one of possibly 
+				many TrueCrypt-related  processes, so we have to rely on consistency established by Truecrypt 
+				application itself. We will take no action to modify system-wide setup. */
+
+			// No other instance is currently attempting to install, check system encryption state
+
+			(SystemEncryptionStatus != SYSENC_STATUS_NONE) ? 
+				SetLastError (TCAPI_E_INCONSISTENT_DRIVER_STATE); : 
+				SetLastError(TCAPI_E_DRIVER_NOT_INSTALLED);
+			return FALSE;
+		} // else we have a driver ready
+	} else {
+		/* load portable driver */
+		// Attempt to load the driver (non-install/portable mode)
+
+		/* TODO: Truecrypt tries this several times in case loaded driver is not of the needed version.
+		   Since we provide an option for the developer to choose which driver to load, we'll load 
+		   exactly the version requested. */
+
+		res = DriverLoad ();
+
+		CloseDriverSetupMutex ();
+
+		if (res != ERROR_SUCCESS) 
+			return FALSE;
+
+		bPortableModeConfirmed = TRUE;
+
+		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+		if (hDriver == INVALID_HANDLE_VALUE) {
+			//TODO: Debug output
+			SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
+			return FALSE;
+		}
+
+		if (bPortableModeConfirmed)
+			NotifyDriverOfPortableMode ();
+	}
 
 	DWORD dwResult;
 
@@ -348,16 +344,24 @@ static BOOL CreateDriverSetupMutex (void)
 	return TCCreateMutex (&hDriverSetupMutex, TC_MUTEX_NAME_DRIVER_SETUP);
 }
 
+static BOOL CheckDriverSetupMutex (void)
+{
+	return TCCheckMutex(&hDriverSetupMutex);
+}
 
 static void CloseDriverSetupMutex (void)
 {
 	TCCloseMutex (&hDriverSetupMutex);
 }
 
+static BOOL TCCheckMutex(volatile HANDLE *hMutex) {
+	return (*hMutex != NULL);
+}
+
 // Returns TRUE if the mutex is (or had been) successfully acquired (otherwise FALSE). 
 static BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name)
 {
-	if (*hMutex != NULL)
+	if TCCheckMutex(*hMutex)
 		return TRUE;	// This instance already has the mutex
 
 	*hMutex = CreateMutex (NULL, TRUE, name);

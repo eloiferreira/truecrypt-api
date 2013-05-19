@@ -89,7 +89,10 @@ protected:
 		pOptions->Options[3].OptionId = TC_OPTION_MOUNT_REMOVABLE;
 		pOptions->Options[3].OptionValue = TRUE;
 
-		pOptions->NumberOfOptions = 4;
+		pOptions->Options[4].OptionId = TC_OPTION_DRIVER_PATH;
+		pOptions->Options[4].OptionValue = L"D:\\Projects\\Active\\truecrypt-x64.sys";
+
+		pOptions->NumberOfOptions = 5;
 
 		cout << "Initializing" << endl;
 		BOOL res = Initialize(pOptions);
