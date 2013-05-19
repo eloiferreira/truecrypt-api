@@ -22,7 +22,7 @@ extern "C" {
 	extern BOOL bTcApiInitialized;
 
 	DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options);
-	DLLEXPORT BOOL APIENTRY Shutdown();
+	DLLEXPORT BOOL APIENTRY Shutdown(void);
 	DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
 
 #ifdef __cplusplus

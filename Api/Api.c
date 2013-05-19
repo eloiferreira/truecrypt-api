@@ -29,7 +29,7 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 	return bTcApiInitialized;
 }
 
-DLLEXPORT BOOL APIENTRY Shutdown() {
+DLLEXPORT BOOL APIENTRY Shutdown(void) {
 
 	//returns FALSE if not initialized
 	TCAPI_CHECK_INITIALIZED(0);
@@ -38,7 +38,7 @@ DLLEXPORT BOOL APIENTRY Shutdown() {
 	return TRUE;
 }
 
-DLLEXPORT BOOL APIENTRY LoadTrueCryptDriver()
+DLLEXPORT BOOL APIENTRY LoadTrueCryptDriver(void)
 {
 	int status = FALSE;
 	

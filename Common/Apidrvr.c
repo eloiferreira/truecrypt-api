@@ -21,56 +21,75 @@ volatile HANDLE hDriverSetupMutex = NULL;
 BOOL bPortableModeConfirmed = FALSE;		// TRUE if it is certain that the instance is running in portable mode
 LONG DriverVersion = 0;
 
+BOOL DriverAttach (void) {
+	/* Try to open a handle to the device driver. It will be closed later. */
+	BOOL res = FALSE;
 
-// Mutex handling to prevent multiple instances of the wizard or main app from trying to install
-// or register the driver or from trying to launch it in portable mode at the same time.
-// Returns TRUE if the mutex is (or had been) successfully acquired (otherwise FALSE). 
-BOOL CreateDriverSetupMutex (void)
-{
-	return TCCreateMutex (&hDriverSetupMutex, TC_MUTEX_NAME_DRIVER_SETUP);
-}
+	/* Attempt to load installed driver */
 
-// Returns TRUE if the mutex is (or had been) successfully acquired (otherwise FALSE). 
-BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name)
-{
-	if (*hMutex != NULL)
-		return TRUE;	// This instance already has the mutex
-
-	*hMutex = CreateMutex (NULL, TRUE, name);
-	if (*hMutex == NULL)
+	hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (hDriver == INVALID_HANDLE_VALUE)
 	{
-		// In multi-user configurations, the OS returns "Access is denied" here when a user attempts
-		// to acquire the mutex if another user already has. However, on Vista, "Access is denied" is
-		// returned also if the mutex is owned by a process with admin rights while we have none.
+		//TODO: System encryption and wipe options omitted for now
+		//LoadSysEncSettings (NULL);
 
-		return FALSE;
+		//TODO: Truecrypt here checks for an inconsistent state between config and driver status and
+		// takes additional actions. We are an applied library in one of possibly many TrueCrypt-related 
+		// processes,so we have to rely on consistency established by Truecrypt application itself. 
+		// We will do checks but take no actions to modify system's state.
+
+		// Attempt to load the driver (non-install/portable mode)
+		// TODO: Truecrypt tries this several times, so should we.
+		res = DriverLoad ();
+
+		if (res != ERROR_SUCCESS) 
+			return FALSE;
+
+		bPortableModeConfirmed = TRUE;
+
+		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+		if (hDriver == INVALID_HANDLE_VALUE) {
+			//TODO: Debug output
+			SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
+			return FALSE;
+		}
+
+		if (bPortableModeConfirmed)
+			NotifyDriverOfPortableMode ();
+	} 
+	else 
+	{
+		DWORD dwResult;
+
+		BOOL bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
+
+		if (!bResult)
+			bResult = DeviceIoControl (hDriver, TC_IOCTL_LEGACY_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
+
+		if (bResult == FALSE)
+		{
+			//TODO: debug output here
+			DriverVersion = 0;
+			SetLastError(TCAPI_E_CANT_GET_DRIVER_VER);
+			return FALSE;
+		}
+		else if (DriverVersion != VERSION_NUM)
+		{
+			DriverUnload ();
+			CloseHandle (hDriver);
+			hDriver = INVALID_HANDLE_VALUE;
+
+			SetLastError(TCAPI_E_WRONG_DRIVER_VER);
+			return FALSE;
+		}
 	}
 
-	if (GetLastError () == ERROR_ALREADY_EXISTS)
-	{
-		ReleaseMutex (*hMutex);
-		CloseHandle (*hMutex);
-
-		*hMutex = NULL;
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-
-void TCCloseMutex (volatile HANDLE *hMutex)
-{
-	if (*hMutex != NULL)
-	{
-		if (ReleaseMutex (*hMutex)
-			&& CloseHandle (*hMutex))
-			*hMutex = NULL;
-	}
+	return DriverVersion;
 }
 
 // Install and start driver service and mark it for removal (non-install mode)
-static int DriverLoad ()
+static int DriverLoad (void)
 {
 	HANDLE file;
 	WIN32_FIND_DATA find;
@@ -82,7 +101,7 @@ static int DriverLoad ()
 
 	if (ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", "Start", &startType) && startType == SERVICE_BOOT_START) {
 		// DriverLoad () is called only when checking whether we are able to load driver in portable mode after we have tried installed mode and failed.
-		// Since here we see the service is actually registered, we shouldn't have fail and get to here in the first place, hence the error.
+		// Since here we see the service is actually registered, we shouldn't have failed and got to here in the first place, hence the error.
 		SetLastError(TCAPI_E_SERVICE_NOT_STARTED);
 		return ERR_PARAMETER_INCORRECT;
 	}
@@ -156,7 +175,7 @@ static int DriverLoad ()
 }
 
 // Tells the driver that it's running in portable mode
-void NotifyDriverOfPortableMode (void)
+static void NotifyDriverOfPortableMode (void)
 {
 	if (hDriver != INVALID_HANDLE_VALUE)
 	{
@@ -166,75 +185,7 @@ void NotifyDriverOfPortableMode (void)
 	}
 }
 
-BOOL DriverAttach (void) {
-	/* Try to open a handle to the device driver. It will be closed later. */
-	BOOL res = FALSE;
-	//int nLoadRetryCount = 0;
-
-	// Attempt to load installed driver
-
-	hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-	if (hDriver == INVALID_HANDLE_VALUE)
-	{
-		//TODO: System encryption and wipe options omitted for now
-		//LoadSysEncSettings (NULL);
-		
-		//TODO: Truecrypt here checks for an inconsistent state between config and driver status and
-		//takes additional actions. We are an applied library in one of possibly many TrueCrypt processes,
-		//so we have to rely on consistency established by Truecrypt application itself. We will do checks
-		//but make no actions to modify system's state.
-
-		// Attempt to load the driver (non-install/portable mode)
-		// TODO: Truecrypt tries this several times, so should we.
-		res = DriverLoad ();
-
-		if (res != ERROR_SUCCESS) 
-			return FALSE;
-
-		bPortableModeConfirmed = TRUE;
-
-		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-
-		if (hDriver == INVALID_HANDLE_VALUE) {
-			//TODO: Debug output
-			SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
-			return FALSE;
-		}
-
-		if (bPortableModeConfirmed)
-			NotifyDriverOfPortableMode ();
-	} 
-	else 
-	{
-		DWORD dwResult;
-
-		BOOL bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
-
-		if (!bResult)
-			bResult = DeviceIoControl (hDriver, TC_IOCTL_LEGACY_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
-
-		if (bResult == FALSE)
-		{
-			//TODO: debug output here
-			DriverVersion = 0;
-			SetLastError(TCAPI_E_CANT_GET_DRIVER_VER);
-			return FALSE;
-		}
-		else if (DriverVersion != VERSION_NUM)
-		{
-			DriverUnload ();
-			CloseHandle (hDriver);
-			hDriver = INVALID_HANDLE_VALUE;
-
-			SetLastError(TCAPI_E_WRONG_DRIVER_VER);
-			return FALSE;
-		}
-	}
-
-	return DriverVersion;
-}
-
-int GetDriverRefCount ()
+static int GetDriverRefCount (void)
 {
 	DWORD dwResult;
 	BOOL bResult;
@@ -249,7 +200,7 @@ int GetDriverRefCount ()
 		return -1;
 }
 
-BOOL DriverUnload ()
+static BOOL DriverUnload (void)
 {
 	MOUNT_LIST_STRUCT driver;
 	int refCount;

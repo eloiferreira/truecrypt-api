@@ -328,10 +328,10 @@ extern "C" {
 	extern LONG DriverVersion;
 	
 	BOOL DriverAttach (void);
-	static int DriverLoad ();
-	BOOL DriverUnload ();
-	int GetDriverRefCount ();
-	BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name);
+	static int DriverLoad (void);
+	static BOOL DriverUnload (void);
+	static int GetDriverRefCount (void);
+	static void NotifyDriverOfPortableMode (void);
 
 #ifdef __cplusplus
 }
