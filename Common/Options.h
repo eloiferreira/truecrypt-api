@@ -33,8 +33,19 @@ extern "C" {
 	} TCAPI_OPTIONS, *PTCAPI_OPTIONS;
 
 	extern BOOL bPreserveTimestamp;
+	extern BOOL bCacheInDriver;
+	extern BOOL bMountReadOnly;
+	extern BOOL bMountRemovable;
+
+	/* This value may changed only by calling ChangeSystemEncryptionStatus(). Only the wizard can change it
+	(others may still read it though). */
+	extern int SystemEncryptionStatus;
+
+	/* Only the wizard can change this value (others may only read it). */
+	extern WipeAlgorithmId nWipeMode;
 
 	BOOL ApplyOptions(PTCAPI_OPTIONS options);
+	BOOL LoadSysEncSettings (void);
 
 #ifdef __cplusplus
 }

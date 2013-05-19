@@ -25,64 +25,100 @@ BOOL DriverAttach (void) {
 	/* Try to open a handle to the device driver. It will be closed later. */
 	BOOL res = FALSE;
 
-	/* Attempt to load installed driver */
+start:
 
+	/* Attempt to load installed driver */
 	hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
 	if (hDriver == INVALID_HANDLE_VALUE)
 	{
 		//TODO: System encryption and wipe options omitted for now
-		//LoadSysEncSettings (NULL);
+		LoadSysEncSettings ();
 
-		//TODO: Truecrypt here checks for an inconsistent state between config and driver status and
-		// takes additional actions. We are an applied library in one of possibly many TrueCrypt-related 
-		// processes,so we have to rely on consistency established by Truecrypt application itself. 
-		// We will do checks but take no actions to modify system's state.
+		if (!CreateDriverSetupMutex ())
+		{
+			// Another instance is already attempting to install, register or start the driver
 
-		// Attempt to load the driver (non-install/portable mode)
-		// TODO: Truecrypt tries this several times, so should we.
-		res = DriverLoad ();
+			Sleep (100);	// Wait until the other instance finishes
+			
+			while (!CreateDriverSetupMutex ())
+			{
+				Sleep (100);	// Wait until the other instance finishes
+				//TODO: and we'll hang if another app crashes before releasing the mutex
+			}
 
-		if (res != ERROR_SUCCESS) 
-			return FALSE;
-
-		bPortableModeConfirmed = TRUE;
-
-		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-
-		if (hDriver == INVALID_HANDLE_VALUE) {
-			//TODO: Debug output
-			SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
-			return FALSE;
+			// Try to open a handle to the driver again (keep the mutex in case the other instance failed)
+			goto start;
 		}
+		else
+		{
+			// No other instance is currently attempting to install, register or start the driver
 
-		if (bPortableModeConfirmed)
-			NotifyDriverOfPortableMode ();
-	} 
-	else 
+			if (SystemEncryptionStatus != SYSENC_STATUS_NONE)
+			{
+				//TODO: Truecrypt here checks for an inconsistent state between config and driver status and 
+				// takes additional actions. We, au contraire, are an applied library in one of possibly 
+				// many TrueCrypt-related  processes, so we have to rely on consistency established by Truecrypt 
+				// application itself. We will take no action to modify system-wide setup.
+
+				CloseDriverSetupMutex ();
+				SetLastError (TCAPI_E_INCONSISTENT_DRIVER_STATE);
+				return FALSE;
+			}
+			else
+			{
+				// Attempt to load the driver (non-install/portable mode)
+				
+				// TODO: Truecrypt tries this several times, in case loaded driver is not of the needed version.
+				// We provide an option for a developer to choose what driver to load, so we'll do exactly that.
+
+				res = DriverLoad ();
+
+				CloseDriverSetupMutex ();
+
+				if (res != ERROR_SUCCESS) 
+					return FALSE;
+
+				bPortableModeConfirmed = TRUE;
+
+				hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+				if (hDriver == INVALID_HANDLE_VALUE) {
+					//TODO: Debug output
+					SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
+					return FALSE;
+				}
+				
+				if (bPortableModeConfirmed)
+					NotifyDriverOfPortableMode ();
+			}
+		}
+	}
+
+	CloseDriverSetupMutex ();
+
+	DWORD dwResult;
+
+	BOOL bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
+
+	if (!bResult)
+		bResult = DeviceIoControl (hDriver, TC_IOCTL_LEGACY_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
+
+	if (bResult == FALSE)
 	{
-		DWORD dwResult;
+		//TODO: debug output here
+		DriverVersion = 0;
+		SetLastError(TCAPI_E_CANT_GET_DRIVER_VER);
+		return FALSE;
+	}
+	else if (DriverVersion != VERSION_NUM)
+	{
+		DriverUnload ();
+		CloseHandle (hDriver);
+		hDriver = INVALID_HANDLE_VALUE;
 
-		BOOL bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
-
-		if (!bResult)
-			bResult = DeviceIoControl (hDriver, TC_IOCTL_LEGACY_GET_DRIVER_VERSION, NULL, 0, &DriverVersion, sizeof (DriverVersion), &dwResult, NULL);
-
-		if (bResult == FALSE)
-		{
-			//TODO: debug output here
-			DriverVersion = 0;
-			SetLastError(TCAPI_E_CANT_GET_DRIVER_VER);
-			return FALSE;
-		}
-		else if (DriverVersion != VERSION_NUM)
-		{
-			DriverUnload ();
-			CloseHandle (hDriver);
-			hDriver = INVALID_HANDLE_VALUE;
-
-			SetLastError(TCAPI_E_WRONG_DRIVER_VER);
-			return FALSE;
-		}
+		SetLastError(TCAPI_E_WRONG_DRIVER_VER);
+		return FALSE;
 	}
 
 	return DriverVersion;
@@ -302,6 +338,59 @@ error:
 	}
 
 	return FALSE;
+}
+
+// Mutex handling to prevent multiple instances of the wizard or main app from trying to install
+// or register the driver or from trying to launch it in portable mode at the same time.
+// Returns TRUE if the mutex is (or had been) successfully acquired (otherwise FALSE). 
+static BOOL CreateDriverSetupMutex (void)
+{
+	return TCCreateMutex (&hDriverSetupMutex, TC_MUTEX_NAME_DRIVER_SETUP);
+}
+
+
+static void CloseDriverSetupMutex (void)
+{
+	TCCloseMutex (&hDriverSetupMutex);
+}
+
+// Returns TRUE if the mutex is (or had been) successfully acquired (otherwise FALSE). 
+static BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name)
+{
+	if (*hMutex != NULL)
+		return TRUE;	// This instance already has the mutex
+
+	*hMutex = CreateMutex (NULL, TRUE, name);
+	if (*hMutex == NULL)
+	{
+		// In multi-user configurations, the OS returns "Access is denied" here when a user attempts
+		// to acquire the mutex if another user already has. However, on Vista, "Access is denied" is
+		// returned also if the mutex is owned by a process with admin rights while we have none.
+
+		return FALSE;
+	}
+
+	if (GetLastError () == ERROR_ALREADY_EXISTS)
+	{
+		ReleaseMutex (*hMutex);
+		CloseHandle (*hMutex);
+
+		*hMutex = NULL;
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+
+static void TCCloseMutex (volatile HANDLE *hMutex)
+{
+	if (*hMutex != NULL)
+	{
+		if (ReleaseMutex (*hMutex)
+			&& CloseHandle (*hMutex))
+			*hMutex = NULL;
+	}
 }
 
 #endif /* _WIN32 */

@@ -31,6 +31,10 @@
 #define BYTES_PER_TB                    1099511627776LL
 #define BYTES_PER_PB                    1125899906842624LL
 
+// Config files
+#define TC_APPD_FILENAME_SYSTEM_ENCRYPTION					"System Encryption.xml"
+
+
 /* GUI/driver errors */
 
 #define WIDE(x) (LPWSTR)L##x
@@ -254,6 +258,17 @@ void EraseMemory (void *memory, int size);
 #define TC_HOMEPAGE "http://www.truecrypt.org/"
 #define TC_APPLINK "http://www.truecrypt.org/applink?version=" VERSION_STRING
 #define TC_APPLINK_SECURE "https://www.truecrypt.org/applink?version=" VERSION_STRING
+
+enum system_encryption_status
+{
+	/* WARNING: As these values are written to config files, if they or their meanings
+	are changed, incompatiblity with other versions may arise (upgrade, downgrade, etc.).
+	When adding a new constant, verify that the value is unique within this block. */
+	SYSENC_STATUS_NONE = 0,
+	SYSENC_STATUS_PRETEST = 200,	// This may also mean that the OS is to be (or has been) copied to a hidden volume (to create a hidden OS).
+	SYSENC_STATUS_ENCRYPTING = 400,
+	SYSENC_STATUS_DECRYPTING = 600
+};
 
 enum
 {
