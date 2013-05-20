@@ -52,3 +52,18 @@ DLLEXPORT BOOL APIENTRY LoadTrueCryptDriver(void)
 
 	return status;
 }
+
+DLLEXPORT BOOL APIENTRY UnloadTrueCryptDriver(void)
+{
+	BOOL status = FALSE;
+
+	TCAPI_CHECK_INITIALIZED(0);
+
+	status = DriverUnload ();
+	if (status == FALSE)
+	{
+		//TODO: Doc -> See GetLastError()
+	}
+
+	return status;
+}

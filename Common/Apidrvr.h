@@ -329,7 +329,7 @@ extern "C" {
 	
 	DWORD DriverAttach (void);
 	static int DriverLoad (void);
-	static BOOL DriverUnload (void);
+	BOOL DriverUnload (void);
 	static int GetDriverRefCount (void);
 	static void NotifyDriverOfPortableMode (void);
 	static BOOL CreateDriverSetupMutex (void);

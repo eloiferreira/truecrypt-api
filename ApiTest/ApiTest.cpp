@@ -9,11 +9,13 @@ using namespace std;
 typedef BOOL (STDMETHODCALLTYPE *PINITIALIZE)(PTCAPI_OPTIONS options);
 typedef int (STDMETHODCALLTYPE *PSHUTDOWN)();
 typedef int (STDMETHODCALLTYPE *PLOAD_TC_DRIVER)();
+typedef int (STDMETHODCALLTYPE *PUNLOAD_TC_DRIVER)();
 
 class ApiTest {
 private:
 	HMODULE hApiDll;
 	PLOAD_TC_DRIVER LoadTrueCryptDriver;
+	PUNLOAD_TC_DRIVER UnloadTrueCryptDriver;
 	PINITIALIZE Initialize;
 	PSHUTDOWN Shutdown;
 
@@ -56,6 +58,7 @@ protected:
 		LoadProcAddress((FARPROC *)&Initialize, "Initialize");
 		LoadProcAddress((FARPROC *)&Shutdown, "Shutdown");
 		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
+		LoadProcAddress((FARPROC *)&UnloadTrueCryptDriver, "UnloadTrueCryptDriver");
 
 		return TRUE;
 	}
@@ -105,8 +108,12 @@ protected:
 	}
 
 	void RunShutdown() {
+		cout << "Unloading driver" << endl;
+		BOOL res = UnloadTrueCryptDriver();
+		cout << "UnloadTrueCryptDriver returned " << res << endl;
+
 		cout << "Shutting down" << endl;
-		BOOL res = Shutdown();
+		res = Shutdown();
 		cout << "Shutdown returned " << res << endl;
 	}
 

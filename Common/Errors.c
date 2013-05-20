@@ -11,6 +11,8 @@ governed by license terms which are TBD. */
 #include "Errors.h"
 #include "Uac.h"
 
+#define MAX_FMT_STRING 1024
+
 void handleWin32Error ()
 {
 	DWORD dwError = GetLastError ();
@@ -86,4 +88,15 @@ DWORD HandleDriveNotReadyError (DWORD reportedError)
 
 	RegCloseKey (hkey);
 	return result;
+}
+
+void OutputError(const char* info, DWORD value)
+{
+	char dest[MAX_FMT_STRING];
+	const char *fmt = "%s: %x\n";
+
+	sprintf(dest, fmt, info, value);
+
+	OutputDebugString(dest);
+	//define trace_msg(...) do { char msg[2048]; _snprintf (msg, sizeof (msg), __VA_ARGS__); OutputDebugString (msg); } while (0)
 }

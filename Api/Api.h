@@ -24,6 +24,7 @@ extern "C" {
 	DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options);
 	DLLEXPORT BOOL APIENTRY Shutdown(void);
 	DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
+	DLLEXPORT BOOL APIENTRY UnloadTrueCryptDriver(void);
 
 #ifdef __cplusplus
 }
