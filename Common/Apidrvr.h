@@ -327,11 +327,17 @@ extern "C" {
 	extern HANDLE hDriver;
 	extern LONG DriverVersion;
 	
-	BOOL DriverAttach (void);
+	DWORD DriverAttach (void);
 	static int DriverLoad (void);
 	static BOOL DriverUnload (void);
 	static int GetDriverRefCount (void);
 	static void NotifyDriverOfPortableMode (void);
+	static BOOL CreateDriverSetupMutex (void);
+	static BOOL CheckDriverSetupMutex (void);
+	static void CloseDriverSetupMutex (void);
+	static BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name);
+	static BOOL TCCheckMutex(volatile HANDLE hMutex);
+	static void TCCloseMutex (volatile HANDLE *hMutex);
 
 #ifdef __cplusplus
 }

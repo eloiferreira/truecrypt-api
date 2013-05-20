@@ -72,7 +72,9 @@ protected:
 
 	void RunInitialize() {
 		PTCAPI_OPTIONS pOptions;
-		DWORD memSize = sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * 4);
+		int numOptions = 5;
+
+		DWORD memSize = sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * numOptions);
 
 		pOptions = (PTCAPI_OPTIONS) malloc(memSize);
 		memset(pOptions, 0, memSize);
@@ -90,9 +92,9 @@ protected:
 		pOptions->Options[3].OptionValue = TRUE;
 
 		pOptions->Options[4].OptionId = TC_OPTION_DRIVER_PATH;
-		pOptions->Options[4].OptionValue = L"D:\\Projects\\Active\\truecrypt-x64.sys";
+		pOptions->Options[4].OptionValue = NULL; //(DWORD) &"D:\\Projects\\Active\\truecrypt-x64.sys";
 
-		pOptions->NumberOfOptions = 5;
+		pOptions->NumberOfOptions = numOptions;
 
 		cout << "Initializing" << endl;
 		BOOL res = Initialize(pOptions);
@@ -116,7 +118,11 @@ public:
 
 			cout << "Loading TrueCrypt Driver" << endl;
 			int res = LoadTrueCryptDriver();
-			cout << "LoadTrueCryptDriver returned " << hex << res << endl;
+			if (res == 0) {
+				cout << "Error loading TrueCrypt driver: " << hex << GetLastError() << endl;
+			} else {
+				cout << "LoadTrueCryptDriver version: " << hex << res << endl;
+			}
 
 			RunShutdown();
 		}

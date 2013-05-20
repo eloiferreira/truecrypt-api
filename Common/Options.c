@@ -6,8 +6,11 @@ and all other portions of this file are Copyright (c) 2013 Nic Nilov and are
 governed by license terms which are TBD. */
 
 #include <windows.h>
+#include <ShlObj.h>
+#include <io.h>
 #include "Options.h"
 #include "Errors.h"
+#include "Xml.h"
 
 BOOL bPreserveTimestamp = TRUE;
 BOOL bCacheInDriver = FALSE;
@@ -51,10 +54,14 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			bPreserveTimestamp = option->OptionValue;
 			break;
 		case TC_OPTION_DRIVER_PATH:
-			pathSize = (MAX_PATH + 1);
-			lpszDriverPath = malloc(pathSize);
-			memset(lpszDriverPath, 0, (pathSize));
-			strcpy_s(lpszDriverPath, strlen((const char *)option->OptionValue), (const char *) (option->OptionValue));
+			if (option->OptionValue != 0) {
+				pathSize = (MAX_PATH + 1);
+				lpszDriverPath = malloc(pathSize);
+				memset(lpszDriverPath, 0, (pathSize));
+				strcpy(lpszDriverPath, (const char *) (option->OptionValue));
+			} else {
+				lpszDriverPath = NULL;
+			}
 			break;
 		default:
 			SetLastError(TCAPI_E_WRONG_OPTION);
@@ -66,9 +73,14 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 
 char *GetModPath (char *path, int maxSize)
 {
-	//GetModuleFileName (NULL, path, maxSize);
+	/* NN: Instead of GetModulFileName() we check path 
+	   to executable in address space of which we reside. */
 	strrchr (_pgmptr, '\\')[1] = 0;
 	return path;
+}
+
+BOOL IsNonInstallMode() {
+	return (lpszDriverPath != NULL);
 }
 
 char *GetConfigPath (char *fileName)
