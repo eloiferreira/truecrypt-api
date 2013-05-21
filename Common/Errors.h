@@ -118,6 +118,7 @@ static const DWORD TCAPI_W_DRIVER_NOT_LOADED			= MAKE_TCAPI_WARNING(9);
 static const DWORD TCAPI_W_VOLUMES_STILL_MOUNTED		= MAKE_TCAPI_WARNING(10);
 static const DWORD TCAPI_W_APPS_STILL_ATTACHED			= MAKE_TCAPI_WARNING(11);
 
+#define debug_out(msg, err_no) do { DebugOut(__FUNCTION__, msg, err_no); } while (0)
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,7 +129,7 @@ extern "C" {
 	BOOL IsDiskReadError (DWORD error);
 	BOOL IsDiskWriteError (DWORD error);
 	DWORD HandleDriveNotReadyError (DWORD reportedError);
-	void OutputError(const char* info, DWORD value);
+	void DebugOut(const char *src, const char *msg, DWORD err_no);
 
 #ifdef __cplusplus
 }

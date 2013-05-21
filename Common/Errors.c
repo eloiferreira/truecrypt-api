@@ -90,13 +90,22 @@ DWORD HandleDriveNotReadyError (DWORD reportedError)
 	return result;
 }
 
-void OutputError(const char* info, DWORD value)
+void DebugOut(const char *src, const char *msg, DWORD err_no)
 {
-	char dest[MAX_FMT_STRING];
-	const char *fmt = "%s: %x\n";
+	const char *fmt = "%s: %s (0x%X)\n";
+	size_t needed = _snprintf(NULL, 0, fmt, src, msg, err_no);
+	char *buffer = NULL;
 
-	sprintf(dest, fmt, info, value);
-
-	OutputDebugString(dest);
-	//define trace_msg(...) do { char msg[2048]; _snprintf (msg, sizeof (msg), __VA_ARGS__); OutputDebugString (msg); } while (0)
+	if (needed >= MAX_FMT_STRING) 
+	{
+		//TODO: need more informative output
+		OutputDebugString("Error string is too long");
+		return;
+	}
+	
+	buffer = malloc(needed + 1);
+	_snprintf(buffer, needed, fmt, src, msg, err_no);
+	buffer[needed] = 0;
+	OutputDebugString(buffer);
+	free(buffer);
 }

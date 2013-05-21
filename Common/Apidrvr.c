@@ -42,7 +42,7 @@ DWORD DriverAttach (void) {
 	}
 	
 	if (!CheckDriverSetupMutex()) {
-		OutputError("TCAPI_E_CANT_ACQUIRE_DRIVER", TCAPI_E_CANT_ACQUIRE_DRIVER);
+		debug_out("TCAPI_E_CANT_ACQUIRE_DRIVER", TCAPI_E_CANT_ACQUIRE_DRIVER);
 		SetLastError(TCAPI_E_CANT_ACQUIRE_DRIVER);
 		return FALSE;
 	}
@@ -63,12 +63,12 @@ DWORD DriverAttach (void) {
 			// No other instance is currently attempting to install, check system encryption state
 
 			if (SystemEncryptionStatus != SYSENC_STATUS_NONE) {
-				OutputError("TCAPI_E_INCONSISTENT_DRIVER_STATE", TCAPI_E_INCONSISTENT_DRIVER_STATE);
+				debug_out("TCAPI_E_INCONSISTENT_DRIVER_STATE", TCAPI_E_INCONSISTENT_DRIVER_STATE);
 				SetLastError (TCAPI_E_INCONSISTENT_DRIVER_STATE);
 			}
 			else
 			{
-				OutputError("TCAPI_E_DRIVER_NOT_INSTALLED", TCAPI_E_DRIVER_NOT_INSTALLED);
+				debug_out("TCAPI_E_DRIVER_NOT_INSTALLED", TCAPI_E_DRIVER_NOT_INSTALLED);
 				SetLastError(TCAPI_E_DRIVER_NOT_INSTALLED);
 			}
 
@@ -96,7 +96,7 @@ DWORD DriverAttach (void) {
 		hDriver = CreateFile (WIN32_ROOT_PREFIX, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
 		if (hDriver == INVALID_HANDLE_VALUE) {
-			OutputError("TCAPI_E_CANT_LOAD_DRIVER", TCAPI_E_CANT_LOAD_DRIVER);
+			debug_out("TCAPI_E_CANT_LOAD_DRIVER", TCAPI_E_CANT_LOAD_DRIVER);
 			SetLastError(TCAPI_E_CANT_LOAD_DRIVER);
 			return FALSE;
 		}
@@ -113,7 +113,7 @@ DWORD DriverAttach (void) {
 	if (bResult == FALSE)
 	{
 		DriverVersion = 0;
-		OutputError("TCAPI_E_CANT_GET_DRIVER_VER", TCAPI_E_CANT_GET_DRIVER_VER);
+		debug_out("TCAPI_E_CANT_GET_DRIVER_VER", TCAPI_E_CANT_GET_DRIVER_VER);
 		SetLastError(TCAPI_E_CANT_GET_DRIVER_VER);
 		return FALSE;
 	}
@@ -123,7 +123,7 @@ DWORD DriverAttach (void) {
 		CloseHandle (hDriver);
 		hDriver = INVALID_HANDLE_VALUE;
 
-		OutputError("TCAPI_E_WRONG_DRIVER_VER", TCAPI_E_WRONG_DRIVER_VER);
+		debug_out("TCAPI_E_WRONG_DRIVER_VER", TCAPI_E_WRONG_DRIVER_VER);
 		SetLastError(TCAPI_E_WRONG_DRIVER_VER);
 		return FALSE;
 	}
@@ -145,7 +145,7 @@ static int DriverLoad (void)
 		   This doesn't mitigate the case when driver might not have been started for some reason. A run of TrueCrypt application might fix the state, 
 		   otherwise current system session can be considered unusable. */
 
-		OutputError("TCAPI_E_TC_INSTALLED", TCAPI_E_TC_INSTALLED);
+		debug_out("TCAPI_E_TC_INSTALLED", TCAPI_E_TC_INSTALLED);
 		SetLastError(TCAPI_E_TC_INSTALLED);
 		return ERR_PARAMETER_INCORRECT;
 	}
@@ -155,7 +155,7 @@ static int DriverLoad (void)
 
 	if (file == INVALID_HANDLE_VALUE)
 	{
-		OutputError("TCAPI_E_DRIVER_NOT_FOUND", TCAPI_E_DRIVER_NOT_FOUND);
+		debug_out("TCAPI_E_DRIVER_NOT_FOUND", TCAPI_E_DRIVER_NOT_FOUND);
 		SetLastError(TCAPI_E_DRIVER_NOT_FOUND);
 		return ERR_DONT_REPORT;
 	}
@@ -167,12 +167,12 @@ static int DriverLoad (void)
 	{
 		if (GetLastError () == ERROR_ACCESS_DENIED)
 		{
-			OutputError("TCAPI_E_NOACCESS_SCM", TCAPI_E_NOACCESS_SCM);
+			debug_out("TCAPI_E_NOACCESS_SCM", TCAPI_E_NOACCESS_SCM);
 			SetLastError(TCAPI_E_NOACCESS_SCM);
 			return ERR_DONT_REPORT;
 		}
 		
-		OutputError("TCAPI_E_CANT_OPEN_SCM", TCAPI_E_CANT_OPEN_SCM);
+		debug_out("TCAPI_E_CANT_OPEN_SCM", TCAPI_E_CANT_OPEN_SCM);
 		SetLastError(TCAPI_E_CANT_OPEN_SCM);
 		return ERR_OS_ERROR;
 	}
@@ -185,7 +185,7 @@ static int DriverLoad (void)
 		CloseServiceHandle (hService);
 		Sleep (500);
 		
-		OutputError("TCAPI_W_STALE_SERVICE", TCAPI_W_STALE_SERVICE);
+		debug_out("TCAPI_W_STALE_SERVICE", TCAPI_W_STALE_SERVICE);
 		SetLastError(TCAPI_W_STALE_SERVICE);
 	}
 
@@ -197,7 +197,7 @@ static int DriverLoad (void)
 	{
 		CloseServiceHandle (hManager);
 		
-		OutputError("TCAPI_E_CANT_CREATE_SERVICE", TCAPI_E_CANT_CREATE_SERVICE);
+		debug_out("TCAPI_E_CANT_CREATE_SERVICE", TCAPI_E_CANT_CREATE_SERVICE);
 		SetLastError(TCAPI_E_CANT_CREATE_SERVICE);
 		return ERR_OS_ERROR;
 	}
@@ -209,7 +209,7 @@ static int DriverLoad (void)
 	CloseServiceHandle (hService);
 	
 	if (!res) {
-		OutputError("TCAPI_E_CANT_START_SERVICE", TCAPI_E_CANT_START_SERVICE);
+		debug_out("TCAPI_E_CANT_START_SERVICE", TCAPI_E_CANT_START_SERVICE);
 		SetLastError(TCAPI_E_CANT_START_SERVICE);
 		return ERR_OS_ERROR;
 	}
@@ -258,7 +258,7 @@ BOOL DriverUnload (void)
 	BOOL driverUnloaded = FALSE;
 
 	if (hDriver == INVALID_HANDLE_VALUE) {
-		OutputError("TCAPI_W_DRIVER_NOT_LOADED", TCAPI_W_DRIVER_NOT_LOADED);
+		debug_out("TCAPI_W_DRIVER_NOT_LOADED", TCAPI_W_DRIVER_NOT_LOADED);
 		SetLastError(TCAPI_W_DRIVER_NOT_LOADED);
 		return TRUE;
 	}
@@ -284,7 +284,7 @@ BOOL DriverUnload (void)
 	if (bResult)
 	{
 		if (volumesMounted != 0) {
-			OutputError("TCAPI_W_VOLUMES_STILL_MOUNTED", TCAPI_W_VOLUMES_STILL_MOUNTED);
+			debug_out("TCAPI_W_VOLUMES_STILL_MOUNTED", TCAPI_W_VOLUMES_STILL_MOUNTED);
 			SetLastError(TCAPI_W_VOLUMES_STILL_MOUNTED);
 			return FALSE;
 		}
@@ -296,7 +296,7 @@ BOOL DriverUnload (void)
 	refCount = GetDriverRefCount ();
 
 	if (refCount > 1) {
-		OutputError("TCAPI_W_APPS_STILL_ATTACHED", TCAPI_W_APPS_STILL_ATTACHED);
+		debug_out("TCAPI_W_APPS_STILL_ATTACHED", TCAPI_W_APPS_STILL_ATTACHED);
 		SetLastError(TCAPI_W_APPS_STILL_ATTACHED);
 		return FALSE;
 	}
@@ -308,21 +308,21 @@ BOOL DriverUnload (void)
 
 	hManager = OpenSCManager (NULL, NULL, SC_MANAGER_ALL_ACCESS);
 	if (hManager == NULL) {
-		OutputError("TCAPI_E_CANT_OPEN_SCM", TCAPI_E_CANT_OPEN_SCM);
+		debug_out("TCAPI_E_CANT_OPEN_SCM", TCAPI_E_CANT_OPEN_SCM);
 		SetLastError(TCAPI_E_CANT_OPEN_SCM);
 		goto error;
 	}
 
 	hService = OpenService (hManager, "truecrypt", SERVICE_ALL_ACCESS);
 	if (hService == NULL) {
-		OutputError("TCAPI_E_CANT_OPEN_SERVICE", TCAPI_E_CANT_OPEN_SERVICE);
+		debug_out("TCAPI_E_CANT_OPEN_SERVICE", TCAPI_E_CANT_OPEN_SERVICE);
 		SetLastError(TCAPI_E_CANT_OPEN_SERVICE);
 		goto error;
 	}
 
 	bRet = QueryServiceStatus (hService, &status);
 	if (bRet != TRUE) {
-		OutputError("TCAPI_E_CANT_QUERY_SERVICE", TCAPI_E_CANT_QUERY_SERVICE);
+		debug_out("TCAPI_E_CANT_QUERY_SERVICE", TCAPI_E_CANT_QUERY_SERVICE);
 		SetLastError(TCAPI_E_CANT_QUERY_SERVICE);
 		goto error;
 	}
@@ -335,7 +335,7 @@ BOOL DriverUnload (void)
 		{
 			bRet = QueryServiceStatus (hService, &status);
 			if (bRet != TRUE) {
-				OutputError("TCAPI_E_CANT_QUERY_SERVICE", TCAPI_E_CANT_QUERY_SERVICE);
+				debug_out("TCAPI_E_CANT_QUERY_SERVICE", TCAPI_E_CANT_QUERY_SERVICE);
 				SetLastError(TCAPI_E_CANT_QUERY_SERVICE);
 				goto error;
 			}
