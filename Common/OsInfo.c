@@ -7,30 +7,35 @@ governed by license terms which are TBD. */
 #include <windows.h>
 #include "OsInfo.h"
 #include "Errors.h"
-#include "Apidrvr.h"
 
 OSVersionEnum nCurrentOS = WIN_UNKNOWN;
 int CurrentOSMajor = 0;
 int CurrentOSMinor = 0;
 int CurrentOSServicePack = 0;
 BOOL IsServerOS = FALSE;
+BOOL RemoteSession = FALSE;
 
-DWORD InitOSVersionInfo ()
+BOOL InitOSVersionInfo ()
 {
 	OSVERSIONINFO os;
 	OSVERSIONINFOEX osEx;
-	DWORD result = TCAPI_S_SUCCESS;
 
 	os.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
 
-	if (GetVersionEx (&os) == FALSE)
-		return TCAPI_E_CANT_GET_OS_VER;
+	if (GetVersionEx (&os) == FALSE) {
+		debug_out("TCAPI_E_CANT_GET_OS_VER", TCAPI_E_CANT_GET_OS_VER);
+		SetLastError(TCAPI_E_CANT_GET_OS_VER);
+		return FALSE;
+	}
 
 	CurrentOSMajor = os.dwMajorVersion;
 	CurrentOSMinor = os.dwMinorVersion;
 
-	if (CurrentOSMajor < 5)
-		return TCAPI_E_UNSUPPORTED_OS;
+	if (CurrentOSMajor < 5) {
+		debug_out("TCAPI_E_UNSUPPORTED_OS", TCAPI_E_UNSUPPORTED_OS);
+		SetLastError(TCAPI_E_UNSUPPORTED_OS);
+		return FALSE;
+	}
 
 	if (os.dwPlatformId == VER_PLATFORM_WIN32_NT && CurrentOSMajor == 5 && CurrentOSMinor == 0)
 		nCurrentOS = WIN_2000;
@@ -41,8 +46,11 @@ DWORD InitOSVersionInfo ()
 
 	osEx.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
 
-	if (GetVersionEx ((LPOSVERSIONINFOA) &osEx) == FALSE)
-		return TCAPI_E_CANT_GET_OS_VER;
+	if (GetVersionEx ((LPOSVERSIONINFOA) &osEx) == FALSE) {
+		debug_out("TCAPI_E_CANT_GET_OS_VER", TCAPI_E_CANT_GET_OS_VER);
+		SetLastError(TCAPI_E_CANT_GET_OS_VER);
+		return FALSE;
+	}
 	
 	IsServerOS = (osEx.wProductType == VER_NT_SERVER || osEx.wProductType == VER_NT_DOMAIN_CONTROLLER);
 	
@@ -60,16 +68,19 @@ DWORD InitOSVersionInfo ()
 									albeit probably in reduced functionality mode. We for now will return error 
 									from here and wait and see if this strategy is of any good. */
 
-									/* TODO: Should get back to this when it's clear what we do have to know 
-											 about OS in order to work. */
+	RemoteSession = GetSystemMetrics (SM_REMOTESESSION) != 0;
 
 	// Service pack check & warnings about critical MS issues
 	CurrentOSServicePack = osEx.wServicePackMajor;
 	switch (nCurrentOS)
 	{
 		case WIN_2000:
-			if (osEx.wServicePackMajor < 3)
-				result = TCAPI_W_LARGE_IDE_2K;
+			if (osEx.wServicePackMajor < 3) {
+				debug_out("TCAPI_W_LARGE_IDE_2K", TCAPI_W_LARGE_IDE_2K);
+				SetLastError(TCAPI_W_LARGE_IDE_2K);
+				//TODO: Doc -> check GetLastError() anyway
+				return TRUE;
+			}
 			else
 			{
 				DWORD val = 0, size = sizeof(val);
@@ -79,7 +90,12 @@ DWORD InitOSVersionInfo ()
 				{
 					if (RegQueryValueEx (hkey, "EnableBigLba", 0, 0, (LPBYTE) &val, &size) != ERROR_SUCCESS || val != 1)
 					{
-						result = TCAPI_W_LARGE_IDE_2K_REGISTRY;
+						RegCloseKey (hkey);
+
+						debug_out("TCAPI_W_LARGE_IDE_2K_REGISTRY", TCAPI_W_LARGE_IDE_2K_REGISTRY);
+						SetLastError(TCAPI_W_LARGE_IDE_2K_REGISTRY);
+						//TODO: Doc -> check GetLastError() anyway
+						return TRUE;
 					}
 					RegCloseKey (hkey);
 				}
@@ -90,14 +106,20 @@ DWORD InitOSVersionInfo ()
 			{
 				HKEY k;
 				// PE environment does not report version of SP
-				if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "System\\CurrentControlSet\\Control\\minint", 0, KEY_READ, &k) != ERROR_SUCCESS)
-					result = TCAPI_W_LARGE_IDE_XP;
+				if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "System\\CurrentControlSet\\Control\\minint", 0, KEY_READ, &k) != ERROR_SUCCESS) 
+				{
+					debug_out("TCAPI_W_LARGE_IDE_XP", TCAPI_W_LARGE_IDE_XP);
+					SetLastError(TCAPI_W_LARGE_IDE_XP);
+					//TODO: Doc -> check GetLastError() anyway
+					return TRUE;
+				}
 				else
 					RegCloseKey (k);
 			}
 			break;
 	}
-	return result;
+
+	return TRUE;
 }
 
 BOOL IsOSAtLeast (OSVersionEnum reqMinOS)
@@ -149,33 +171,4 @@ BOOL Is64BitOs ()
 
 	valid = TRUE;
 	return isWow64;
-}
-
-BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
-{
-	HKEY hkey = 0;
-	DWORD size = sizeof (*value);
-	DWORD type;
-
-	if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, subKey, 0, KEY_READ, &hkey) != ERROR_SUCCESS)
-		return FALSE;
-
-	if (RegQueryValueEx (hkey, name, NULL, &type, (BYTE *) value, &size) != ERROR_SUCCESS)
-	{
-		RegCloseKey (hkey);
-		return FALSE;
-	}
-
-	RegCloseKey (hkey);
-	return type == REG_DWORD;
-}
-
-uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ()
-{
-	DWORD count;
-
-	if (!ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", TC_ENCRYPTION_FREE_CPU_COUNT_REG_VALUE_NAME, &count))
-		count = 0;
-
-	return count;
 }

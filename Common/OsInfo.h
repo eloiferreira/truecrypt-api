@@ -48,13 +48,12 @@ extern "C" {
 	extern int CurrentOSMinor;
 	extern int CurrentOSServicePack;
 	extern BOOL IsServerOS;
+	extern BOOL RemoteSession;
 
-	DWORD InitOSVersionInfo ();
+	BOOL InitOSVersionInfo ();
 	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
 	BOOL Is64BitOs ();
-	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
-	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
 
 #ifdef __cplusplus
 }

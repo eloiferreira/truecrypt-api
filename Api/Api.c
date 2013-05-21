@@ -13,6 +13,12 @@ BOOL bTcApiInitialized = FALSE;
 
 DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 
+	if (!InitOSVersionInfo()) {
+		//TODO: Doc -> See GetLastError()
+		//TODO: Doc -> Warnings may be saturated by subsequent errors
+		return FALSE;
+	}
+
 	if (!options || !ApplyOptions(options)) {
 		//TODO: Doc -> See GetLastError()
 		return FALSE;

@@ -9,7 +9,7 @@ governed by license terms which are TBD. */
 #define OPTIONS_H
 
 #include "Wipe.h"
-
+//TODO: refactor to enum
 #define TC_OPTION_BASE					0x800
 #define TC_OPTION_CACHE_PASSWORDS		TC_OPTION_BASE + 1
 #define TC_OPTION_MOUNT_READONLY		TC_OPTION_BASE + 2
@@ -50,6 +50,8 @@ extern "C" {
 
 	BOOL ApplyOptions(PTCAPI_OPTIONS options);
 	BOOL LoadSysEncSettings (void);
+	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
+	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
 
 #ifdef __cplusplus
 }

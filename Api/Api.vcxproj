@@ -145,6 +145,9 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\Ipc.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\Common\Options.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
@@ -210,6 +213,7 @@
     <ClInclude Include="..\Common\Endian.h" />
     <ClInclude Include="..\Common\Errors.h" />
     <ClInclude Include="..\Common\GfMul.h" />
+    <ClInclude Include="..\Common\Ipc.h" />
     <ClInclude Include="..\Common\Options.h" />
     <ClInclude Include="..\Common\OsInfo.h" />
     <ClInclude Include="..\Common\Password.h" />
