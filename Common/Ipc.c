@@ -71,3 +71,34 @@ static void TCCloseMutex (volatile HANDLE *hMutex)
 			*hMutex = NULL;
 	}
 }
+
+BOOL IsTrueCryptInstallerRunning (void)
+{
+	return (MutexExistsOnSystem (TC_MUTEX_NAME_APP_SETUP));
+}
+
+// Returns TRUE if a process running on the system has the specified mutex (otherwise FALSE). 
+static BOOL MutexExistsOnSystem (char *name)
+{
+	HANDLE hMutex = INVALID_HANDLE_VALUE;
+
+	if (name[0] == 0)
+		return FALSE;
+
+	hMutex = OpenMutex (MUTEX_ALL_ACCESS, FALSE, name);
+
+	if (hMutex == NULL)
+	{
+		if (GetLastError () == ERROR_FILE_NOT_FOUND)
+			return FALSE;
+
+		if (GetLastError () == ERROR_ACCESS_DENIED) // On Vista, this is returned if the owner of the mutex is elevated while we are not
+			return TRUE;		
+
+		// The call failed and it is not certain whether the mutex exists or not
+		return FALSE;
+	}
+
+	CloseHandle (hMutex);
+	return TRUE;
+}

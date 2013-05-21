@@ -6,6 +6,7 @@
 #include "OsInfo.h"
 #include "EncryptionThreadPool.h"
 #include "Apidrvr.h"
+#include "Ipc.h"
 
 BOOL bTcApiInitialized = FALSE;
 
@@ -19,6 +20,12 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 		return FALSE;
 	}
 
+	if (IsTrueCryptInstallerRunning()) {
+		debug_out("TCAPI_E_TC_INSTALLER_RUNNING", TCAPI_E_TC_INSTALLER_RUNNING);
+		SetLastError(TCAPI_E_TC_INSTALLER_RUNNING);
+		return FALSE;
+	}
+
 	if (!options || !ApplyOptions(options)) {
 		//TODO: Doc -> See GetLastError()
 		return FALSE;
@@ -27,6 +34,7 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 	if (!EncryptionThreadPoolStart (ReadEncryptionThreadPoolFreeCpuCountLimit()))
 	{
 		//TODO: Doc -> See GetLastError()
+		debug_out("TCAPI_E_CANT_START_ENCPOOL", TCAPI_E_CANT_START_ENCPOOL);
 		SetLastError(TCAPI_E_CANT_START_ENCPOOL);
 		return FALSE;
 	}

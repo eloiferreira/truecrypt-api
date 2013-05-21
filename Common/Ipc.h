@@ -22,9 +22,11 @@ extern "C" {
 	BOOL CreateDriverSetupMutex (void);
 	BOOL CheckDriverSetupMutex (void);
 	void CloseDriverSetupMutex (void);
+	BOOL IsTrueCryptInstallerRunning (void);
 	static BOOL TCCreateMutex (volatile HANDLE *hMutex, char *name);
 	static BOOL TCCheckMutex(volatile HANDLE hMutex);
 	static void TCCloseMutex (volatile HANDLE *hMutex);
+	static BOOL MutexExistsOnSystem (char *name);
 
 #ifdef __cplusplus
 }
