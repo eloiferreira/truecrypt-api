@@ -48,9 +48,15 @@ extern "C" {
 	/* Only the wizard can change this value (others may only read it). */
 	extern WipeAlgorithmId nWipeMode;
 
+	extern BOOL bPortableModeConfirmed;
+	extern BOOL bInPlaceEncNonSysPending;
+
+	static BOOL LoadStoredSettings();
 	BOOL ApplyOptions(PTCAPI_OPTIONS options);
 	BOOL LoadSysEncSettings (void);
+	int LoadNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm);
 	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
+	uint32 ReadDriverConfigurationFlags ();
 	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
 
 #ifdef __cplusplus

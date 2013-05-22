@@ -28,6 +28,10 @@ char *lpszDriverPath = NULL;
 (others may still read it though). */
 int SystemEncryptionStatus = SYSENC_STATUS_NONE;	
 
+BOOL bPortableModeConfirmed = FALSE;		// TRUE if it is certain that the instance is running in portable mode
+
+BOOL bInPlaceEncNonSysPending = FALSE;		// TRUE if the non-system in-place encryption config file indicates that one or more partitions are scheduled to be encrypted. This flag is set only when config files are loaded during app startup.
+
 /* Only the wizard can change this value (others may only read it). */
 WipeAlgorithmId nWipeMode = TC_WIPE_NONE;
 
@@ -65,16 +69,40 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			}
 			break;
 		default:
+			debug_out("TCAPI_E_WRONG_OPTION", TCAPI_E_WRONG_OPTION);
 			SetLastError(TCAPI_E_WRONG_OPTION);
 			return FALSE;
 		}
 	}
+
+	if (!LoadStoredSettings()) {
+		//TODO: Doc -> See GetLastError()
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static BOOL LoadStoredSettings() {
+	WipeAlgorithmId savedWipeAlgorithm = TC_WIPE_NONE;
+
+	EnableHwEncryption ((ReadDriverConfigurationFlags() & TC_DRIVER_CONFIG_DISABLE_HARDWARE_ENCRYPTION) ? FALSE : TRUE);
+
+	if (LoadSysEncSettings()) {
+		debug_out("TCAPI_E_TC_CONFIG_CORRUPTED", TCAPI_E_TC_CONFIG_CORRUPTED);
+		SetLastError(TCAPI_E_TC_CONFIG_CORRUPTED);
+		return FALSE;
+	}
+
+	//TODO: need to check if this is an issue for us.
+	if (LoadNonSysInPlaceEncSettings (&savedWipeAlgorithm) != 0)
+		bInPlaceEncNonSysPending = TRUE;
+
 	return TRUE;
 }
 
 char *GetModPath (char *path, int maxSize)
 {
-	/* NN: Instead of GetModulFileName() we check path 
+	/* NN: Instead of GetModuleFileName() we check path 
 	   to executable in address space of which we reside. */
 	strrchr (_pgmptr, '\\')[1] = 0;
 	return path;
@@ -162,18 +190,29 @@ BOOL FileExists (const char *filePathPtr)
 BOOL LoadSysEncSettings (void)
 {
 	DWORD size = 0;
-	char *sysEncCfgFileBuf = LoadFile (GetConfigPath (TC_APPD_FILENAME_SYSTEM_ENCRYPTION), &size);
-	char *xml = sysEncCfgFileBuf;
+	char *sysEncCfgFileBuf = NULL;
+	char *xml = NULL;
+	char *configPath = NULL;
 	char paramName[100], paramVal[MAX_PATH];
 
 	// Defaults
 	int newSystemEncryptionStatus = SYSENC_STATUS_NONE;
 	WipeAlgorithmId newnWipeMode = TC_WIPE_NONE;
 
-	if (!FileExists (GetConfigPath (TC_APPD_FILENAME_SYSTEM_ENCRYPTION)))
+	/* TODO: In case portable TrueCrypt was used to set up system encryption and has not finished
+	   we won't be able to detect the state by config files since we don't know the TC's directory.
+	   Actually it seems TC itself when used from another folder will not be able to do that.
+	   Will have to check whether boot-related facilities can tell more */
+
+	configPath = GetConfigPath (TC_APPD_FILENAME_SYSTEM_ENCRYPTION);
+	if (!FileExists (configPath))
 	{
 		SystemEncryptionStatus = newSystemEncryptionStatus;
 		nWipeMode = newnWipeMode;
+	} 
+	else {
+		sysEncCfgFileBuf = LoadFile (configPath, &size);
+		xml = sysEncCfgFileBuf;
 	}
 
 	if (xml == NULL)
@@ -205,6 +244,39 @@ BOOL LoadSysEncSettings (void)
 	return TRUE;
 }
 
+// Returns the number of partitions where non-system in-place encryption is progress or had been in progress
+// but was interrupted. In addition, via the passed pointer, returns the last selected wipe algorithm ID.
+int LoadNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm)
+{
+	char *fileBuf = NULL;
+	char *fileBuf2 = NULL;
+	DWORD size, size2;
+	int count;
+
+	*wipeAlgorithm = TC_WIPE_NONE;
+
+	if (!FileExists (GetConfigPath (TC_APPD_FILENAME_NONSYS_INPLACE_ENC)))
+		return 0;
+
+	if ((fileBuf = LoadFile (GetConfigPath (TC_APPD_FILENAME_NONSYS_INPLACE_ENC), &size)) == NULL)
+		return 0;
+
+	if (FileExists (GetConfigPath (TC_APPD_FILENAME_NONSYS_INPLACE_ENC_WIPE)))
+	{
+		if ((fileBuf2 = LoadFile (GetConfigPath (TC_APPD_FILENAME_NONSYS_INPLACE_ENC_WIPE), &size2)) != NULL)
+			*wipeAlgorithm = (WipeAlgorithmId) atoi (fileBuf2);
+	}
+
+	count = atoi (fileBuf);
+
+	if (fileBuf != NULL)
+		TCfree (fileBuf);
+
+	if (fileBuf2 != NULL)
+		TCfree (fileBuf2);
+
+	return (count);
+}
 
 BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
 {
@@ -223,6 +295,16 @@ BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
 
 	RegCloseKey (hkey);
 	return type == REG_DWORD;
+}
+
+uint32 ReadDriverConfigurationFlags ()
+{
+	DWORD configMap;
+
+	if (!ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", TC_DRIVER_CONFIG_REG_VALUE_NAME, &configMap))
+		configMap = 0;
+
+	return configMap;
 }
 
 uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ()

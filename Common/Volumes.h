@@ -144,18 +144,6 @@ enum
 	HIDVOL_PROT_STATUS_ACTION_TAKEN			/* Active + action taken (write operation has already been denied) */
 };
 
-typedef struct
-{
-	BOOL ReadOnly;
-	BOOL Removable;
-	BOOL ProtectHiddenVolume;
-	BOOL PreserveTimestamp;
-	BOOL PartitionInInactiveSysEncScope;	/* If TRUE, we are to attempt to mount a partition located on an encrypted system drive without pre-boot authentication. */
-	Password ProtectedHidVolPassword;	/* Password of hidden volume to protect against overwriting */
-	BOOL UseBackupHeader;
-	BOOL RecoveryMode;
-} MountOptions;
-
 #ifndef TC_HEADER_Volume_VolumeHeader
 
 #include "Password.h"

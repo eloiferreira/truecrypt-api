@@ -31,8 +31,15 @@
 #define BYTES_PER_TB                    1099511627776LL
 #define BYTES_PER_PB                    1125899906842624LL
 
-// Config files
+// TrueCrypt config files
+#define TC_APPD_FILENAME_CONFIGURATION						"Configuration.xml"
 #define TC_APPD_FILENAME_SYSTEM_ENCRYPTION					"System Encryption.xml"
+#define TC_APPD_FILENAME_DEFAULT_KEYFILES					"Default Keyfiles.xml"
+#define TC_APPD_FILENAME_HISTORY							"History.xml"
+#define TC_APPD_FILENAME_FAVORITE_VOLUMES					"Favorite Volumes.xml"
+#define TC_APPD_FILENAME_SYSTEM_FAVORITE_VOLUMES			TC_APP_NAME " System Favorite Volumes.xml"
+#define TC_APPD_FILENAME_NONSYS_INPLACE_ENC					"In-Place Encryption"
+#define TC_APPD_FILENAME_NONSYS_INPLACE_ENC_WIPE			"In-Place Encryption Wipe Algo"
 
 
 /* GUI/driver errors */

@@ -16,7 +16,6 @@ governed by license terms which are TBD. */
 /* Handle to the device driver */
 HANDLE hDriver = INVALID_HANDLE_VALUE;
 
-BOOL bPortableModeConfirmed = FALSE;		// TRUE if it is certain that the instance is running in portable mode
 LONG DriverVersion = 0;
 
 DWORD DriverAttach (void) {

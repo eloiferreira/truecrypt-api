@@ -17,6 +17,7 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 	if (!InitOSVersionInfo()) {
 		//TODO: Doc -> See GetLastError()
 		//TODO: Doc -> Warnings may be saturated by subsequent errors
+		//TODO: Save warnings here and pass at the end in case of no error
 		return FALSE;
 	}
 
