@@ -75,7 +75,7 @@ protected:
 
 	void RunInitialize() {
 		PTCAPI_OPTIONS pOptions;
-		int numOptions = 5;
+		int numOptions = 6;
 
 		DWORD memSize = sizeof TCAPI_OPTIONS + (sizeof TCAPI_OPTION * numOptions);
 
@@ -97,6 +97,9 @@ protected:
 		pOptions->Options[4].OptionId = TC_OPTION_DRIVER_PATH;
 		pOptions->Options[4].OptionValue = NULL; //(DWORD) &"D:\\Projects\\Active\\truecrypt-x64.sys";
 
+		pOptions->Options[5].OptionId = TC_OPTION_WIPE_CACHE_ON_EXIT;
+		pOptions->Options[5].OptionValue = TRUE;
+		
 		pOptions->NumberOfOptions = numOptions;
 
 		cout << "Initializing" << endl;

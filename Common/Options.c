@@ -17,6 +17,7 @@ BOOL bPreserveTimestamp = TRUE;
 BOOL bCacheInDriver = FALSE;
 BOOL bMountReadOnly = FALSE;
 BOOL bMountRemovable = FALSE;
+BOOL bWipeCacheOnExit = FALSE;		/* Wipe password from cache on exit */
 
 /* NN: Path to TrueCrypt driver. If NULL, denotes use of installed driver, otherwise the one at path. 
 Since we load the specified driver only and do not attempt to discover other options, the value of this 
@@ -56,6 +57,9 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			bMountRemovable = option->OptionValue;
 			break;
 		case TC_OPTION_PRESERVE_TIMESTAMPS:
+			bPreserveTimestamp = option->OptionValue;
+			break;
+		case TC_OPTION_WIPE_CACHE_ON_EXIT:
 			bPreserveTimestamp = option->OptionValue;
 			break;
 		case TC_OPTION_DRIVER_PATH:

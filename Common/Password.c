@@ -332,7 +332,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 		on disk hdd media would not reallistically allow to recover any data even after only 'a few passes of 
 		random scrubbing'. Flash media, SSD drives are whole another story. Here is his article on this 
 		topic: http://www.cypherpunks.to/~peter/usenix01.pdf. This said not to diminish TrueCrypt effort 
-		to practice most stringent approach on security, but just to keep a correct perspective on the topic. */
+		to practice most stringent approach on security, but to keep a correct perspective on the topic. */
 
 		for (wipePass = 0; wipePass < PRAND_DISK_WIPE_PASSES; wipePass++)
 		{

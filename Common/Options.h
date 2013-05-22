@@ -16,10 +16,11 @@ governed by license terms which are TBD. */
 #define TC_OPTION_MOUNT_REMOVABLE		TC_OPTION_BASE + 3
 #define TC_OPTION_PRESERVE_TIMESTAMPS	TC_OPTION_BASE + 4
 #define TC_OPTION_HIDDEN_SECTOR_STATUS	TC_OPTION_BASE + 5
-#define TC_OPTION_USE_KEYFILES			TC_OPTION_BASE + 6
+#define TC_OPTION_ENABLE_KEYFILES		TC_OPTION_BASE + 6
 #define TC_OPTION_MOUNT_CLOSE_SESSIONS	TC_OPTION_BASE + 7
 #define TC_OPTION_TOKEN_LIBRARY			TC_OPTION_BASE + 8
 #define TC_OPTION_DRIVER_PATH			TC_OPTION_BASE + 9
+#define TC_OPTION_WIPE_CACHE_ON_EXIT	TC_OPTION_BASE + 10
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,8 @@ extern "C" {
 	extern BOOL bCacheInDriver;
 	extern BOOL bMountReadOnly;
 	extern BOOL bMountRemovable;
+	extern BOOL bWipeCacheOnExit;
+
 	char *lpszDriverPath;
 
 	/* This value may changed only by calling ChangeSystemEncryptionStatus(). Only the wizard can change it
