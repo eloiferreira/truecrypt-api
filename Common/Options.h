@@ -56,8 +56,8 @@ extern "C" {
 
 	static BOOL LoadStoredSettings();
 	BOOL ApplyOptions(PTCAPI_OPTIONS options);
-	BOOL LoadSysEncSettings (void);
-	int LoadNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm);
+	BOOL TryDetectSystemEncryptionStatus (void);
+	int TryDetectNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm);
 	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
 	uint32 ReadDriverConfigurationFlags ();
 	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();

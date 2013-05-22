@@ -12,6 +12,7 @@ governed by license terms which are TBD. */
 #include "Errors.h"
 #include "Apidrvr.h"
 #include "Xml.h"
+#include "Mount.h"
 
 BOOL bPreserveTimestamp = TRUE;
 BOOL bCacheInDriver = FALSE;
@@ -31,7 +32,7 @@ int SystemEncryptionStatus = SYSENC_STATUS_NONE;
 
 BOOL bPortableModeConfirmed = FALSE;		// TRUE if it is certain that the instance is running in portable mode
 
-BOOL bInPlaceEncNonSysPending = FALSE;		// TRUE if the non-system in-place encryption config file indicates that one or more partitions are scheduled to be encrypted. This flag is set only when config files are loaded during app startup.
+BOOL bInPlaceEncNonSysPending = FALSE;		/* TRUE if the non-system in-place encryption config file indicates that one or more partitions are scheduled to be encrypted. */
 
 /* Only the wizard can change this value (others may only read it). */
 WipeAlgorithmId nWipeMode = TC_WIPE_NONE;
@@ -42,6 +43,13 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 	DWORD pathSize = 0;
 	PTCAPI_OPTION option = NULL;
 
+	defaultMountOptions.Removable =	FALSE;
+	defaultMountOptions.ReadOnly =	FALSE;
+	defaultMountOptions.ProtectHiddenVolume = FALSE;
+	defaultMountOptions.PartitionInInactiveSysEncScope = FALSE;
+	defaultMountOptions.RecoveryMode = FALSE;
+	defaultMountOptions.UseBackupHeader =  FALSE;
+
 	for (i = 0; i < (int) options->NumberOfOptions; i++) {
 		
 		option = &options->Options[i];
@@ -51,10 +59,10 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			bCacheInDriver = option->OptionValue;
 			break;
 		case TC_OPTION_MOUNT_READONLY:
-			bMountReadOnly = option->OptionValue;
+			defaultMountOptions.ReadOnly = bMountReadOnly = option->OptionValue;
 			break;
 		case TC_OPTION_MOUNT_REMOVABLE:
-			bMountRemovable = option->OptionValue;
+			defaultMountOptions.Removable = bMountRemovable = option->OptionValue;
 			break;
 		case TC_OPTION_PRESERVE_TIMESTAMPS:
 			bPreserveTimestamp = option->OptionValue;
@@ -91,15 +99,21 @@ static BOOL LoadStoredSettings() {
 
 	EnableHwEncryption ((ReadDriverConfigurationFlags() & TC_DRIVER_CONFIG_DISABLE_HARDWARE_ENCRYPTION) ? FALSE : TRUE);
 
-	if (LoadSysEncSettings()) {
+	if (TryDetectSystemEncryptionStatus()) {
 		debug_out("TCAPI_E_TC_CONFIG_CORRUPTED", TCAPI_E_TC_CONFIG_CORRUPTED);
 		SetLastError(TCAPI_E_TC_CONFIG_CORRUPTED);
 		return FALSE;
 	}
 
 	//TODO: need to check if this is an issue for us.
-	if (LoadNonSysInPlaceEncSettings (&savedWipeAlgorithm) != 0)
+	if (TryDetectNonSysInPlaceEncSettings (&savedWipeAlgorithm) != 0)
 		bInPlaceEncNonSysPending = TRUE;
+
+	mountOptions = defaultMountOptions;
+
+	//TODO: Boot project transfer
+	//if (IsHiddenOSRunning())
+	//	HiddenSysLeakProtectionNotificationStatus =	ConfigReadInt ("HiddenSystemLeakProtNotifStatus", TC_HIDDEN_OS_READ_ONLY_NOTIF_MODE_NONE);
 
 	return TRUE;
 }
@@ -191,7 +205,8 @@ BOOL FileExists (const char *filePathPtr)
 	return (_access (filePath, 0) != -1);
 }
 
-BOOL LoadSysEncSettings (void)
+// nee BOOL LoadSysEncSettings (void)
+BOOL TryDetectSystemEncryptionStatus (void)
 {
 	DWORD size = 0;
 	char *sysEncCfgFileBuf = NULL;
@@ -250,7 +265,8 @@ BOOL LoadSysEncSettings (void)
 
 // Returns the number of partitions where non-system in-place encryption is progress or had been in progress
 // but was interrupted. In addition, via the passed pointer, returns the last selected wipe algorithm ID.
-int LoadNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm)
+// nee int LoadNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm)
+int TryDetectNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm)
 {
 	char *fileBuf = NULL;
 	char *fileBuf2 = NULL;
