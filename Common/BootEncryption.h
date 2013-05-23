@@ -12,5 +12,36 @@ governed by license terms which are TBD. */
 #include "Exception.h"
 #include "Volumes.h"
 
+#ifdef __cplusplus
+
+#include <string>
+
+using namespace std;
+
+namespace TrueCrypt
+{
+	class File
+	{
+	public:
+		File () : FileOpen (false) { }
+		File (string path, bool readOnly = false, bool create = false);
+		~File () { Close(); }
+
+		void Close ();
+		DWORD Read (byte *buffer, DWORD size);
+		void Write (byte *buffer, DWORD size);
+		void SeekAt (int64 position);
+
+	protected:
+		bool Elevated;
+		bool FileOpen;
+		uint64 FilePointerPosition;
+		HANDLE Handle;
+		bool IsDevice;
+		string Path;
+	};
+}
+
+#endif
 
 #endif
