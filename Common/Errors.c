@@ -109,3 +109,16 @@ void DebugOut(const char *src, const char *msg, DWORD err_no)
 	OutputDebugString(buffer);
 	free(buffer);
 }
+
+int Error (const char *stringId)
+{
+	//TODO: implementation
+	return 0;
+}
+
+int ErrorDirect (const wchar_t *errMsg)
+{
+	//TODO: implementation
+	return 0;
+}
+

@@ -132,6 +132,8 @@ extern "C" {
 	BOOL IsDiskWriteError (DWORD error);
 	DWORD HandleDriveNotReadyError (DWORD reportedError);
 	void DebugOut(const char *src, const char *msg, DWORD err_no);
+	int Error (const char *stringId);
+	int ErrorDirect (const wchar_t *errMsg);
 
 #ifdef __cplusplus
 }

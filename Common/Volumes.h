@@ -147,6 +147,7 @@ enum
 #ifndef TC_HEADER_Volume_VolumeHeader
 
 #include "Password.h"
+#include "Crypto.h"
 
 extern BOOL ReadVolumeHeaderRecoveryMode;
 

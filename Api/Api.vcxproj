@@ -121,6 +121,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\Common\BootEncryption.cpp" />
     <ClCompile Include="..\Common\Crc.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
@@ -210,11 +211,13 @@
   <ItemGroup>
     <ClInclude Include="..\Common\Apidrvr.h" />
     <ClInclude Include="..\Common\BootDefs.h" />
+    <ClInclude Include="..\Common\BootEncryption.h" />
     <ClInclude Include="..\Common\Crc.h" />
     <ClInclude Include="..\Common\Crypto.h" />
     <ClInclude Include="..\Common\EncryptionThreadPool.h" />
     <ClInclude Include="..\Common\Endian.h" />
     <ClInclude Include="..\Common\Errors.h" />
+    <ClInclude Include="..\Common\Exception.h" />
     <ClInclude Include="..\Common\GfMul.h" />
     <ClInclude Include="..\Common\Ipc.h" />
     <ClInclude Include="..\Common\Mount.h" />

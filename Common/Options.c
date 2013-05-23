@@ -13,6 +13,7 @@ governed by license terms which are TBD. */
 #include "Apidrvr.h"
 #include "Xml.h"
 #include "Mount.h"
+#include "BootEncryption.h"
 
 BOOL bPreserveTimestamp = TRUE;
 BOOL bCacheInDriver = FALSE;
