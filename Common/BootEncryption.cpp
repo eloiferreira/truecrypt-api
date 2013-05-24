@@ -25,6 +25,7 @@ namespace TrueCrypt
 
 		static void CallDriver (DWORD ioctl, void *input, DWORD inputSize, void *output, DWORD outputSize)
 		{
+//TODO: Gotto decide whether to implement COM-based elevation inside the dll or leave it to developers.
 			Elevate();
 
 			CComBSTR inputBstr;
