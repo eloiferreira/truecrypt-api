@@ -11,6 +11,19 @@ governed by license terms which are TBD. */
 
 namespace TrueCrypt
 {
+	 /* NN: TrueCrypt impements COM-based elevation in order to perform privileged
+	 functions. Although this dll strives to perform most of these functions as well,
+	 elevation of execution level is left upon controlling application. This decision 
+	 is based on following reasoning:
+	 1. While COM-based is the most flexible elevation approach and TC rightly uses it 
+	 for elevation on demand, this dll might be used both in "completely administrative" 
+	 and per-function elevating apllications so it should not impose its ways on the
+	 developer.
+	 2. There is little dll-specific uac-related documentation in MSDN and most 
+	 reasonable conclusion from available information is that it's exe's responsibility
+	 to handle uac whether through manifest or programmatically using COM or ShellExecute.
+	 3. The fact that exactly the same code is called before and after elevation 
+	 makes its separation from elevation itself quite appropriate. */
 
 #define SRC_POS (__FUNCTION__ ":" TC_TO_STRING(__LINE__))
 
@@ -25,7 +38,6 @@ namespace TrueCrypt
 
 		static void CallDriver (DWORD ioctl, void *input, DWORD inputSize, void *output, DWORD outputSize)
 		{
-//TODO: Gotto decide whether to implement COM-based elevation inside the dll or leave it to developers.
 			Elevate();
 
 			CComBSTR inputBstr;
