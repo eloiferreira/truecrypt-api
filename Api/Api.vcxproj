@@ -148,6 +148,7 @@
     </ClCompile>
     <ClCompile Include="..\Common\Ipc.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Mount.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
@@ -157,8 +158,8 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\OsInfo.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Password.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
@@ -173,8 +174,8 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Strings.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\Common\Uac.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
@@ -197,6 +198,7 @@
     </ClCompile>
     <ClCompile Include="Api.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="dllmain.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -206,9 +208,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Boot\Windows\BootCommon.h" />
+    <ClInclude Include="..\Boot\Windows\BootDefs.h" />
     <ClInclude Include="..\Common\Apidrvr.h" />
     <ClInclude Include="..\Common\BootDefs.h" />
     <ClInclude Include="..\Common\BootEncryption.h" />
@@ -233,6 +238,38 @@
     <ClInclude Include="..\Common\Wipe.h" />
     <ClInclude Include="..\Common\Xml.h" />
     <ClInclude Include="..\Common\Xts.h" />
+    <ClInclude Include="..\Platform\Buffer.h" />
+    <ClInclude Include="..\Platform\Directory.h" />
+    <ClInclude Include="..\Platform\Event.h" />
+    <ClInclude Include="..\Platform\Exception.h" />
+    <ClInclude Include="..\Platform\File.h" />
+    <ClInclude Include="..\Platform\FileStream.h" />
+    <ClInclude Include="..\Platform\FilesystemPath.h" />
+    <ClInclude Include="..\Platform\Finally.h" />
+    <ClInclude Include="..\Platform\ForEach.h" />
+    <ClInclude Include="..\Platform\Functor.h" />
+    <ClInclude Include="..\Platform\Memory.h" />
+    <ClInclude Include="..\Platform\MemoryStream.h" />
+    <ClInclude Include="..\Platform\Mutex.h" />
+    <ClInclude Include="..\Platform\Platform.h" />
+    <ClInclude Include="..\Platform\PlatformBase.h" />
+    <ClInclude Include="..\Platform\PlatformTest.h" />
+    <ClInclude Include="..\Platform\Serializable.h" />
+    <ClInclude Include="..\Platform\Serializer.h" />
+    <ClInclude Include="..\Platform\SerializerFactory.h" />
+    <ClInclude Include="..\Platform\SharedPtr.h" />
+    <ClInclude Include="..\Platform\SharedVal.h" />
+    <ClInclude Include="..\Platform\Stream.h" />
+    <ClInclude Include="..\Platform\StringConverter.h" />
+    <ClInclude Include="..\Platform\SyncEvent.h" />
+    <ClInclude Include="..\Platform\System.h" />
+    <ClInclude Include="..\Platform\SystemException.h" />
+    <ClInclude Include="..\Platform\SystemInfo.h" />
+    <ClInclude Include="..\Platform\SystemLog.h" />
+    <ClInclude Include="..\Platform\TextReader.h" />
+    <ClInclude Include="..\Platform\Thread.h" />
+    <ClInclude Include="..\Platform\Time.h" />
+    <ClInclude Include="..\Platform\User.h" />
     <ClInclude Include="Api.h" />
   </ItemGroup>
   <ItemGroup>

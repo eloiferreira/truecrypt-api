@@ -121,6 +121,7 @@ static const DWORD TCAPI_W_VOLUMES_STILL_MOUNTED		= MAKE_TCAPI_WARNING(10);
 static const DWORD TCAPI_W_APPS_STILL_ATTACHED			= MAKE_TCAPI_WARNING(11);
 
 #define debug_out(msg, err_no) do { DebugOut(__FUNCTION__, msg, err_no); } while (0)
+#define handle_win_error do {DWORD err = MAKE_WINDOWS_ERROR(GetLastError()); debug_out("WINDOWS_ERROR", err); SetLastError(err); } while (0)
 
 #ifdef __cplusplus
 extern "C" {

@@ -54,9 +54,13 @@ extern "C" {
 	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
 	BOOL Is64BitOs ();
+	BOOL ResolveSymbolicLink (const wchar_t *symLinkName, PWSTR targetName);
 
 #ifdef __cplusplus
 }
+
+int GetDiskDeviceDriveLetter (PWSTR deviceName);
+
 #endif
 
 #endif

@@ -7,6 +7,7 @@ governed by license terms which are TBD. */
 #include <windows.h>
 #include "OsInfo.h"
 #include "Errors.h"
+#include "Apidrvr.h"
 
 OSVersionEnum nCurrentOS = WIN_UNKNOWN;
 int CurrentOSMajor = 0;
@@ -171,4 +172,49 @@ BOOL Is64BitOs ()
 
 	valid = TRUE;
 	return isWow64;
+}
+
+BOOL ResolveSymbolicLink (const wchar_t *symLinkName, PWSTR targetName)
+{
+	BOOL bResult;
+	DWORD dwResult;
+	RESOLVE_SYMLINK_STRUCT resolve;
+
+	memset (&resolve, 0, sizeof(resolve));
+	wcscpy ((PWSTR) &resolve.symLinkName, symLinkName);
+
+	bResult = DeviceIoControl (hDriver, TC_IOCTL_GET_RESOLVED_SYMLINK, &resolve,
+		sizeof (resolve), &resolve, sizeof (resolve), &dwResult,
+		NULL);
+
+	wcscpy (targetName, (PWSTR) &resolve.targetName);
+
+	return bResult;
+}
+
+// Returns drive letter number assigned to device (-1 if none)
+int GetDiskDeviceDriveLetter (PWSTR deviceName)
+{
+	int i;
+	WCHAR link[MAX_PATH];
+	WCHAR target[MAX_PATH];
+	WCHAR device[MAX_PATH];
+
+	if (!ResolveSymbolicLink (deviceName, device))
+		wcscpy (device, deviceName);
+
+	for (i = 0; i < 26; i++)
+	{
+		WCHAR drive[] = { (WCHAR) i + 'A', ':', 0 };
+
+		wcscpy (link, L"\\DosDevices\\");
+		wcscat (link, drive);
+
+		ResolveSymbolicLink (link, target);
+
+		if (wcscmp (device, target) == 0)
+			return i;
+	}
+
+	return -1;
 }

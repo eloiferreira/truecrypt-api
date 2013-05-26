@@ -17,6 +17,16 @@ extern "C" {
 
 #ifdef __cplusplus
 }
+
+#include <string>
+
+std::wstring SingleStringToWide (const std::string &singleString);
+std::wstring Utf8StringToWide (const std::string &utf8String);
+std::string WideToSingleString (const std::wstring &wideString);
+std::string WideToUtf8String (const std::wstring &wideString);
+std::string StringToUpperCase (const std::string &str);
+std::string ToUpperCase (const std::string &str);
+
 #endif
 
 #endif

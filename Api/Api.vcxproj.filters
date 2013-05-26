@@ -16,6 +16,12 @@
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{61ecd92f-3b82-4501-86ed-90db87b71114}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{e9267d15-8d8b-41d8-9f6f-df938c7a4078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Boot">
+      <UniqueIdentifier>{15267102-7fc7-40cd-b6bf-92349bd10f12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Api.c">
@@ -163,6 +169,108 @@
     </ClInclude>
     <ClInclude Include="..\Common\Exception.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\ForEach.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\PlatformBase.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Finally.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SystemLog.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\StringConverter.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Buffer.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Memory.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SystemException.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Exception.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Serializable.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Directory.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Event.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\File.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\FileStream.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\FilesystemPath.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Functor.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\MemoryStream.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Mutex.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Platform.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\PlatformTest.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Serializer.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SerializerFactory.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SharedPtr.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SharedVal.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Stream.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SyncEvent.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\System.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\SystemInfo.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\TextReader.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Thread.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\Time.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Platform\User.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Boot\Windows\BootCommon.h">
+      <Filter>Header Files\Boot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Boot\Windows\BootDefs.h">
+      <Filter>Header Files\Boot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
