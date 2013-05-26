@@ -14,6 +14,8 @@ governed by license terms which are TBD. */
 #include "Xml.h"
 #include "Mount.h"
 #include "BootEncryption.h"
+#include "Registry.h"
+#include "OsInfo.h"
 
 BOOL bPreserveTimestamp = TRUE;
 BOOL bCacheInDriver = FALSE;
@@ -184,28 +186,6 @@ char *LoadFile (const char *fileName, DWORD *size)
 	return buf;
 }
 
-// Returns TRUE if the file or directory exists (both may be enclosed in quotation marks).
-BOOL FileExists (const char *filePathPtr)
-{
-	char filePath [TC_MAX_PATH];
-
-	// Strip quotation marks (if any)
-	if (filePathPtr [0] == '"')
-	{
-		strcpy (filePath, filePathPtr + 1);
-	}
-	else
-	{
-		strcpy (filePath, filePathPtr);
-	}
-
-	// Strip quotation marks (if any)
-	if (filePath [strlen (filePath) - 1] == '"')
-		filePath [strlen (filePath) - 1] = 0;
-
-	return (_access (filePath, 0) != -1);
-}
-
 // nee BOOL LoadSysEncSettings (void)
 BOOL TryDetectSystemEncryptionStatus (void)
 {
@@ -297,35 +277,6 @@ int TryDetectNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm)
 		TCfree (fileBuf2);
 
 	return (count);
-}
-
-BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value)
-{
-	HKEY hkey = 0;
-	DWORD size = sizeof (*value);
-	DWORD type;
-
-	if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, subKey, 0, KEY_READ, &hkey) != ERROR_SUCCESS)
-		return FALSE;
-
-	if (RegQueryValueEx (hkey, name, NULL, &type, (BYTE *) value, &size) != ERROR_SUCCESS)
-	{
-		RegCloseKey (hkey);
-		return FALSE;
-	}
-
-	RegCloseKey (hkey);
-	return type == REG_DWORD;
-}
-
-uint32 ReadDriverConfigurationFlags ()
-{
-	DWORD configMap;
-
-	if (!ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", TC_DRIVER_CONFIG_REG_VALUE_NAME, &configMap))
-		configMap = 0;
-
-	return configMap;
 }
 
 uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ()

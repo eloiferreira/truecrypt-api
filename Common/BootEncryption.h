@@ -11,6 +11,7 @@ governed by license terms which are TBD. */
 #include "Tcdefs.h"
 #include "Exception.h"
 #include "Volumes.h"
+#include "Apidrvr.h"
 
 #ifdef __cplusplus
 
@@ -139,12 +140,76 @@ namespace TrueCrypt
 		Partition GetPartitionForHiddenOS ();
 		void InvalidateCachedSysDriveProperties ();
 		SystemDriveConfiguration GetSystemDriveConfiguration ();
+		DWORD GetDriverServiceStartType ();
+		void SetDriverServiceStartType (DWORD startType);
+		void ProbeRealSystemDriveSize ();
+		string GetTempPath ();
+		uint16 GetInstalledBootLoaderVersion ();
+		bool IsBootLoaderOnDrive (char *devicePath);
+		BootEncryptionStatus GetStatus ();
+		void GetVolumeProperties (VOLUME_PROPERTIES_STRUCT *properties);
+		bool IsHiddenSystemRunning ();
+		BOOL IsHiddenOSRunning (void);
+		bool SystemDriveContainsPartitionType (byte type);
+		bool SystemDriveContainsExtendedPartition ();
+		bool SystemDriveContainsNonStandardPartitions ();
+		bool SystemDriveIsDynamic ();
+		bool SystemPartitionCoversWholeDrive ();
+		void ReadBootSectorConfig (byte *config, size_t bufLength, byte *userConfig = nullptr, string *customUserMessage = nullptr, uint16 *bootLoaderVersion = nullptr);
+		void WriteBootSectorConfig (const byte newConfig[]);
+		void WriteBootSectorUserConfig (byte userConfig, const string &customUserMessage);
+		unsigned int GetHiddenOSCreationPhase ();
+		void SetHiddenOSCreationPhase (unsigned int newPhase);
+		void StartDecoyOSWipe (WipeAlgorithmId wipeAlgorithm);
+		void AbortDecoyOSWipe ();
+		DecoySystemWipeStatus GetDecoyOSWipeStatus ();
+		void CheckDecoyOSWipeResult ();
+		void WipeHiddenOSCreationConfig ();
+		void InstallBootLoader (bool preserveUserConfig = false, bool hiddenOSCreation = false);
+		string GetSystemLoaderBackupPath ();
+		void RenameDeprecatedSystemLoaderBackup ();
+		void CreateRescueIsoImage (bool initialSetup, const string &isoImagePath);
+		bool IsCDDrivePresent ();
+		bool VerifyRescueDisk ();
+		void AbortSetup ();
+		void AbortSetupWait ();
+		void RegisterFilterDriver (bool registerDriver, FilterType filterType);
+		void RegisterSystemFavoritesService (BOOL registerService);
+		void SetDriverConfigurationFlag (uint32 flag, bool state);
+		void WriteLocalMachineRegistryDwordValue (char *keyPath, char *valueName, DWORD value);
+		void CheckRequirements ();
+		void CheckRequirementsHiddenOS ();
+		void InitialSecurityChecksForHiddenOS ();
+		int ChangePassword (Password *oldPassword, Password *newPassword, int pkcs5);
+		void CheckEncryptionSetupResult ();
+		void RegisterBootDriver (bool hiddenSystem);
+		void Install (bool hiddenSystem);
+		void Deinstall (bool displayWaitDialog = false);
+		void PrepareHiddenOSCreation (int ea, int mode, int pkcs5);
+		void PrepareInstallation (bool systemPartitionOnly, Password &password, int ea, int mode, int pkcs5, const string &rescueIsoImagePath);
+		bool IsPagingFileActive (BOOL checkNonWindowsPartitionsOnly);
+		void RestrictPagingFilesToSystemPartition ();
+		void StartDecryption (BOOL discardUnreadableEncryptedSectors);
+		void StartEncryption (WipeAlgorithmId wipeAlgorithm, bool zeroUnreadableSectors);
+		void CopyFileAdmin (const string &sourceFile, const string &destinationFile);
+		void DeleteFileAdmin (const string &file);
+		void WriteBootDriveSector (uint64 offset, byte *data);
+		bool RestartComputer (void);
 
 	protected:
 		static const uint32 RescueIsoImageSize = 1835008; // Size of ISO9660 image with bootable emulated 1.44MB floppy disk image
 		PartitionList GetDrivePartitions (int driveNumber);
 		string GetWindowsDirectory ();
 		wstring GetRemarksOnHiddenOS ();
+		DISK_GEOMETRY GetDriveGeometry (int driveNumber);
+		uint32 GetChecksum (byte *data, size_t size);
+		void CreateBootLoaderInMemory (byte *buffer, size_t bufferSize, bool rescueDisk, bool hiddenOSCreation = false);
+		void CreateVolumeHeader (uint64 volumeSize, uint64 encryptedAreaStart, Password *password, int ea, int mode, int pkcs5);
+		void InstallVolumeHeader ();
+		void BackupSystemLoader ();
+		void RestoreSystemLoader ();
+		void RegisterFilter (bool registerFilter, FilterType filterType, const GUID *deviceClassGuid = nullptr);
+
 
 		SystemDriveConfiguration DriveConfig;
 		int SelectedEncryptionAlgorithmId;

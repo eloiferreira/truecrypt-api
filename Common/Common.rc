@@ -1,0 +1,91 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// BIN
+//
+
+IDR_BOOT_SECTOR         BIN                     "..\\Boot\\Windows\\Release\\BootSector.bin"
+IDR_BOOT_SECTOR_AES     BIN                     "..\\Boot\\Windows\\Release_AES\\BootSector.bin"
+IDR_BOOT_SECTOR_SERPENT BIN                     "..\\Boot\\Windows\\Release_Serpent\\BootSector.bin"
+IDR_BOOT_SECTOR_TWOFISH BIN                     "..\\Boot\\Windows\\Release_Twofish\\BootSector.bin"
+IDR_BOOT_LOADER_DECOMPRESSOR BIN                     "..\\Boot\\Windows\\Release\\Decompressor.com"
+IDR_BOOT_LOADER         BIN                     "..\\Boot\\Windows\\Release\\BootLoader.com.gz"
+IDR_BOOT_LOADER_AES     BIN                     "..\\Boot\\Windows\\Release_AES\\BootLoader.com.gz"
+IDR_BOOT_LOADER_SERPENT BIN                     "..\\Boot\\Windows\\Release_Serpent\\BootLoader.com.gz"
+IDR_BOOT_LOADER_TWOFISH BIN                     "..\\Boot\\Windows\\Release_Twofish\\BootLoader.com.gz"
+IDR_RESCUE_BOOT_SECTOR  BIN                     "..\\Boot\\Windows\\Rescue\\BootSector.bin"
+IDR_RESCUE_BOOT_SECTOR_AES BIN                     "..\\Boot\\Windows\\Rescue_AES\\BootSector.bin"
+IDR_RESCUE_BOOT_SECTOR_SERPENT BIN                     "..\\Boot\\Windows\\Rescue_Serpent\\BootSector.bin"
+IDR_RESCUE_BOOT_SECTOR_TWOFISH BIN                     "..\\Boot\\Windows\\Rescue_Twofish\\BootSector.bin"
+IDR_RESCUE_LOADER       BIN                     "..\\Boot\\Windows\\Rescue\\BootLoader.com.gz"
+IDR_RESCUE_LOADER_AES   BIN                     "..\\Boot\\Windows\\Rescue_AES\\BootLoader.com.gz"
+IDR_RESCUE_LOADER_SERPENT BIN                     "..\\Boot\\Windows\\Rescue_Serpent\\BootLoader.com.gz"
+IDR_RESCUE_LOADER_TWOFISH BIN                     "..\\Boot\\Windows\\Rescue_Twofish\\BootLoader.com.gz"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HEADER
+//
+
+IDR_COMMON_RSRC_HEADER  HEADER                  "..\\Common\\Resource.h"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

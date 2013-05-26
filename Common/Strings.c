@@ -5,6 +5,8 @@ Modifications and additions to the original source code (contained in this file)
 and all other portions of this file are Copyright (c) 2013 Nic Nilov and are 
 governed by license terms which are TBD. */
 
+#include "Tcdefs.h"
+
 #include "Strings.h"
 #include <Windows.h>
 #include <string.h>
@@ -35,6 +37,95 @@ void UpperCaseCopy (char *lpszDest, const char *lpszSource)
 	while (--i >= 0)
 	{
 		lpszDest[i] = (char) toupper (lpszSource[i]);
+	}
+}
+
+BOOL BufferContainsString (const byte *buffer, size_t bufferSize, const char *str)
+{
+	size_t strLen = strlen (str);
+
+	if (bufferSize < strLen)
+		return FALSE;
+
+	bufferSize -= strLen;
+
+	for (size_t i = 0; i < bufferSize; ++i)
+	{
+		if (memcmp (buffer + i, str, strLen) == 0)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+#pragma warning(push)
+#pragma warning(disable:4702)
+
+void *err_malloc (size_t size)
+{
+	void *z = (void *) TCalloc (size);
+	if (z)
+		return z;
+	TC_THROW_FATAL_EXCEPTION;
+	return 0;
+}
+
+#pragma warning(pop)
+
+
+char *err_strdup (char *lpszText)
+{
+	int j = (strlen (lpszText) + 1) * sizeof (char);
+	char *z = (char *) err_malloc (j);
+	memmove (z, lpszText, j);
+	return z;
+}
+
+/*****************************************************************************
+  ToSBCS: converts a unicode string to Single Byte Character String (SBCS).
+  ***************************************************************************/
+
+void ToSBCS (LPWSTR lpszText)
+{
+	int j = wcslen (lpszText);
+	if (j == 0)
+	{
+		strcpy ((char *) lpszText, "");
+		return;
+	}
+	else
+	{
+		char *lpszNewText = (char *) err_malloc (j + 1);
+		j = WideCharToMultiByte (CP_ACP, 0L, lpszText, -1, lpszNewText, j + 1, NULL, NULL);
+		if (j > 0)
+			strcpy ((char *) lpszText, lpszNewText);
+		else
+			strcpy ((char *) lpszText, "");
+		free (lpszNewText);
+	}
+}
+
+/*****************************************************************************
+  ToUNICODE: converts a SBCS string to a UNICODE string.
+  ***************************************************************************/
+
+void ToUNICODE (char *lpszText)
+{
+	int j = strlen (lpszText);
+	if (j == 0)
+	{
+		wcscpy ((LPWSTR) lpszText, (LPWSTR) WIDE (""));
+		return;
+	}
+	else
+	{
+		LPWSTR lpszNewText = (LPWSTR) err_malloc ((j + 1) * 2);
+		j = MultiByteToWideChar (CP_ACP, 0L, lpszText, -1, lpszNewText, j + 1);
+		if (j > 0)
+			wcscpy ((LPWSTR) lpszText, lpszNewText);
+		else
+			wcscpy ((LPWSTR) lpszText, (LPWSTR) WIDE (""));
+		free (lpszNewText);
 	}
 }
 

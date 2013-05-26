@@ -770,7 +770,7 @@ BOOL FastPoll (void)
 	return TRUE;
 }
 
-void UserEnrichRandomPool (HWND hwndDlg)
+void UserEnrichRandomPool (void)
 {
 	Randinit();
 

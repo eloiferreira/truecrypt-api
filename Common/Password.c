@@ -308,7 +308,7 @@ int ChangePwd (char *lpszVolume, Password *oldPassword, Password *newPassword, i
 
 	RandSetHashFunction (cryptoInfo->pkcs5);
 
-	UserEnrichRandomPool (hwndDlg);
+	UserEnrichRandomPool ();
 
 	/* Re-encrypt the volume header */ 
 	backupHeader = FALSE;

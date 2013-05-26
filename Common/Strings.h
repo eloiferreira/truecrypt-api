@@ -8,12 +8,19 @@ governed by license terms which are TBD. */
 #ifndef STRINGS_H
 #define STRINGS_H
 
+#include <Windows.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 	
 	void LowerCaseCopy (char *lpszDest, const char *lpszSource);
 	void UpperCaseCopy (char *lpszDest, const char *lpszSource);
+	void ToSBCS ( LPWSTR lpszText );
+	void ToUNICODE ( char *lpszText );
+	void *err_malloc ( size_t size );
+	char *err_strdup ( char *lpszText );
+	BOOL BufferContainsString (const byte *buffer, size_t bufferSize, const char *str);
 
 #ifdef __cplusplus
 }

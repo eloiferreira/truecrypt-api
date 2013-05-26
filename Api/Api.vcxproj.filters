@@ -22,6 +22,9 @@
     <Filter Include="Header Files\Boot">
       <UniqueIdentifier>{15267102-7fc7-40cd-b6bf-92349bd10f12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Common">
+      <UniqueIdentifier>{1c8cdd61-9c29-4220-b24b-0e223f209da5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Api.c">
@@ -91,6 +94,9 @@
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\BootEncryption.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Registry.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -272,10 +278,72 @@
     <ClInclude Include="..\Boot\Windows\BootDefs.h">
       <Filter>Header Files\Boot</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Api.def">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\Boot\Windows\Release\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_Twofish\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_AES\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_Serpent\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_Twofish\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_AES\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_Serpent\BootSector.bin">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release\Decompressor.com">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_AES\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_Serpent\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Release_Twofish\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_AES\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_Serpent\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+    <None Include="..\Boot\Windows\Rescue_Twofish\BootLoader.com.gz">
+      <Filter>Resource Files\Common</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Common\Common.rc">
+      <Filter>Resource Files\Common</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

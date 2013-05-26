@@ -55,11 +55,20 @@ extern "C" {
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
 	BOOL Is64BitOs ();
 	BOOL ResolveSymbolicLink (const wchar_t *symLinkName, PWSTR targetName);
+	BOOL GetDriveGeometry (const char *deviceName, PDISK_GEOMETRY diskGeometry);
+	BYTE *MapResource (char *resourceType, int resourceId, PDWORD size);
+	BOOL FileExists (const char *filePathPtr);
+	BOOL IsPagingFileActive (BOOL checkNonWindowsPartitionsOnly);
+	BOOL IsPagingFileWildcardActive ();
+	BOOL RestartComputer (void);
 
 #ifdef __cplusplus
 }
 
+#include <string>
+
 int GetDiskDeviceDriveLetter (PWSTR deviceName);
+std::string GetServiceConfigPath (const char *fileName);
 
 #endif
 

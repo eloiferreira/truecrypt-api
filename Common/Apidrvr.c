@@ -10,6 +10,8 @@ governed by license terms which are TBD. */
 #include "Errors.h"
 #include "Options.h"
 #include "Ipc.h"
+#include "Registry.h"
+#include "BootEncryption.h"
 
 #ifdef _WIN32
 
@@ -17,6 +19,30 @@ governed by license terms which are TBD. */
 HANDLE hDriver = INVALID_HANDLE_VALUE;
 
 LONG DriverVersion = 0;
+
+using namespace TrueCrypt;
+
+BootEncryption			*BootEncObj = NULL;
+
+BOOL InitBootEncryption() {
+	try
+	{
+		BootEncObj = new BootEncryption ();
+	}
+	catch (Exception &e)
+	{
+		e.Show ();
+		return FALSE;
+	}
+
+	if (BootEncObj == NULL)
+		return FALSE;
+	//TODO: more info
+	//AbortProcess ("INIT_SYS_ENC");
+	
+	
+	return TRUE;
+}
 
 DWORD DriverAttach (void) {
 	/* Try to open a handle to the device driver. It will be closed later. */
@@ -363,5 +389,20 @@ error:
 
 	return FALSE;
 }
+
+uint32 ReadDriverConfigurationFlags ()
+{
+	DWORD configMap;
+
+	if (!ReadLocalMachineRegistryDword ("SYSTEM\\CurrentControlSet\\Services\\truecrypt", TC_DRIVER_CONFIG_REG_VALUE_NAME, &configMap))
+		configMap = 0;
+
+	return configMap;
+}
+
+//void SetDriverConfigurationFlag (uint32 flag, BOOL state)
+//{
+//	BootEncObj->SetDriverConfigurationFlag (flag, state ? true : false);
+//}
 
 #endif /* _WIN32 */

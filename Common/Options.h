@@ -31,10 +31,15 @@ extern "C" {
 		DWORD OptionValue;
 	} TCAPI_OPTION, *PTCAPI_OPTION;
 
+#pragma warning(push)
+#pragma warning(disable:4200)
+
 	typedef struct {
 		DWORD NumberOfOptions;
 		TCAPI_OPTION Options[];
 	} TCAPI_OPTIONS, *PTCAPI_OPTIONS;
+
+#pragma warning(pop)
 
 	extern BOOL bPreserveTimestamp;
 	extern BOOL bCacheInDriver;
@@ -42,7 +47,7 @@ extern "C" {
 	extern BOOL bMountRemovable;
 	extern BOOL bWipeCacheOnExit;
 
-	char *lpszDriverPath;
+	extern char *lpszDriverPath;
 
 	/* This value may changed only by calling ChangeSystemEncryptionStatus(). Only the wizard can change it
 	(others may still read it though). */
@@ -58,9 +63,9 @@ extern "C" {
 	BOOL ApplyOptions(PTCAPI_OPTIONS options);
 	BOOL TryDetectSystemEncryptionStatus (void);
 	int TryDetectNonSysInPlaceEncSettings (WipeAlgorithmId *wipeAlgorithm);
-	BOOL ReadLocalMachineRegistryDword (char *subKey, char *name, DWORD *value);
-	uint32 ReadDriverConfigurationFlags ();
 	uint32 ReadEncryptionThreadPoolFreeCpuCountLimit ();
+	BOOL IsNonInstallMode();
+	char *GetConfigPath (char *fileName);
 
 #ifdef __cplusplus
 }

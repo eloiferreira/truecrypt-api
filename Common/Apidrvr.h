@@ -327,9 +327,13 @@ extern "C" {
 	BOOL DriverUnload (void);
 	static int GetDriverRefCount (void);
 	static void NotifyDriverOfPortableMode (void);
+	uint32 ReadDriverConfigurationFlags ();
 
 #ifdef __cplusplus
 }
+
+BOOL InitBootEncryption();
+
 #endif
 
 
