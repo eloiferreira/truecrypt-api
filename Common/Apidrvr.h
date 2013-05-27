@@ -318,7 +318,7 @@ typedef struct
 extern "C" {
 #endif
 
-	/* Handle to the device driver */
+    /* Handle to the device driver */
 	extern HANDLE hDriver;
 	extern LONG DriverVersion;
 	

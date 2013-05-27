@@ -22,8 +22,6 @@ LONG DriverVersion = 0;
 
 using namespace TrueCrypt;
 
-BootEncryption			*BootEncObj = NULL;
-
 BOOL InitBootEncryption() {
 	try
 	{

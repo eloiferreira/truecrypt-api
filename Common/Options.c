@@ -76,7 +76,7 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 		case TC_OPTION_DRIVER_PATH:
 			if (option->OptionValue != 0) {
 				pathSize = (MAX_PATH + 1);
-				lpszDriverPath = malloc(pathSize);
+				lpszDriverPath = (char *) malloc(pathSize);
 				memset(lpszDriverPath, 0, (pathSize));
 				strcpy(lpszDriverPath, (const char *) (option->OptionValue));
 			} else {

@@ -22,6 +22,7 @@ using namespace std;
 
 namespace TrueCrypt
 {
+
 	class File
 	{
 	public:
@@ -222,6 +223,12 @@ namespace TrueCrypt
 		bool RescueVolumeHeaderValid;
 		bool VolumeHeaderValid;
 	};
+
+
+	extern BootEncryption			*BootEncObj;
+	extern BootEncryptionStatus	BootEncStatus;
+	extern BootEncryptionStatus	RecentBootEncStatus;
+
 
 #define TC_ABORT_TRANSFORM_WAIT_INTERVAL	10
 

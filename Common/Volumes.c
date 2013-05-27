@@ -1257,5 +1257,4 @@ BOOL GetPartitionInfo (const char *deviceName, PPARTITION_INFORMATION rpartInfo)
 	return bResult;
 }
 
-
 #endif // !defined (DEVICE_DRIVER) && !defined (TC_WINDOWS_BOOT)

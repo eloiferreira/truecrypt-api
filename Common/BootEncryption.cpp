@@ -28,6 +28,11 @@ governed by license terms which are TBD. */
 
 namespace TrueCrypt
 {
+
+	BootEncryption			*BootEncObj;
+	BootEncryptionStatus	BootEncStatus;
+	BootEncryptionStatus	RecentBootEncStatus;
+
 	 /* NN: TrueCrypt impements COM-based elevation in order to perform privileged
 	 functions. Although this dll strives to perform most of these functions as well,
 	 elevation of execution level is left upon controlling application. This decision 
