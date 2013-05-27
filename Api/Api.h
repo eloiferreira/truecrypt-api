@@ -12,6 +12,7 @@
 #include <winver.h>
 
 #include "Options.h"
+#include "Password.h"
 
 #define DLLEXPORT __declspec(dllexport)
 
@@ -25,6 +26,7 @@ extern "C" {
 	DLLEXPORT BOOL APIENTRY Shutdown(void);
 	DLLEXPORT int APIENTRY LoadTrueCryptDriver(void);
 	DLLEXPORT BOOL APIENTRY UnloadTrueCryptDriver(void);
+	DLLEXPORT BOOL APIENTRY MountV(int nDosDriveNo, char *szFileName, Password VolumePassword);
 
 #ifdef __cplusplus
 }

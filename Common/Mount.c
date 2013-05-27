@@ -1088,8 +1088,8 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 	//if (nDosDriveNo == 0)
 	//	nDosDriveNo = HIWORD (GetSelectedLong (GetDlgItem (hwndDlg, IDC_DRIVELIST))) - 'A';
 
-	if (!MultipleMountOperationInProgress)
-		VolumePassword.Length = 0;
+	//if (!MultipleMountOperationInProgress)
+	//	VolumePassword.Length = 0;
 
 	if (szFileName == NULL)
 	{

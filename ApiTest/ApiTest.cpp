@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "..\Common\Options.h"
+#include "..\Common\Password.h"
 
 using namespace std;
 
@@ -10,6 +11,7 @@ typedef BOOL (STDMETHODCALLTYPE *PINITIALIZE)(PTCAPI_OPTIONS options);
 typedef int (STDMETHODCALLTYPE *PSHUTDOWN)();
 typedef int (STDMETHODCALLTYPE *PLOAD_TC_DRIVER)();
 typedef int (STDMETHODCALLTYPE *PUNLOAD_TC_DRIVER)();
+typedef BOOL (STDMETHODCALLTYPE *PMOUNT)(int nDosDriveNo, char *szFileName, Password VolumePassword);
 
 class ApiTest {
 private:
@@ -18,6 +20,7 @@ private:
 	PUNLOAD_TC_DRIVER UnloadTrueCryptDriver;
 	PINITIALIZE Initialize;
 	PSHUTDOWN Shutdown;
+	PMOUNT Mount;
 
 protected:
 	BOOL LoadTrueCryptApi(LPCTSTR path) {
@@ -59,6 +62,7 @@ protected:
 		LoadProcAddress((FARPROC *)&Shutdown, "Shutdown");
 		LoadProcAddress((FARPROC *)&LoadTrueCryptDriver, "LoadTrueCryptDriver");
 		LoadProcAddress((FARPROC *)&UnloadTrueCryptDriver, "UnloadTrueCryptDriver");
+		LoadProcAddress((FARPROC *)&Mount, "MountV");
 
 		return TRUE;
 	}
@@ -120,9 +124,25 @@ protected:
 		cout << "Shutdown returned " << res << endl;
 	}
 
+	void RunMount() {
+		Password pass;
+		const char *passString = "lalala";
+		memset(&pass, 0, sizeof pass);
+		
+		pass.Length = strlen(passString);
+		strcpy ((char *) &pass.Text[0], passString);
+
+		cout << "Mounting volume" << endl;
+
+		BOOL res = Mount(15, "d:\\test.dat", pass);
+
+		cout << "Volume mount result: " << res << endl;
+
+	}
+
 public:
 	void run() {
-		if (!LoadTrueCryptApi(L"TrueCryptApi.dll")) return;
+		if (!LoadTrueCryptApi("TrueCryptApi.dll")) return;
 		if (GetApiAddresses()) {
 			RunInitialize();
 
@@ -134,10 +154,12 @@ public:
 				cout << "LoadTrueCryptDriver version: " << hex << res << endl;
 			}
 
+			RunMount();
+
 			RunShutdown();
 		}
 		UnloadTrueCryptApi();
-	}
+		}
 };
 
 int _tmain(int argc, _TCHAR* argv[])

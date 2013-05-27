@@ -7,6 +7,7 @@
 #include "EncryptionThreadPool.h"
 #include "Apidrvr.h"
 #include "Ipc.h"
+#include "Mount.h"
 
 BOOL bTcApiInitialized = FALSE;
 
@@ -75,6 +76,21 @@ DLLEXPORT BOOL APIENTRY UnloadTrueCryptDriver(void)
 	TCAPI_CHECK_INITIALIZED(0);
 
 	status = DriverUnload ();
+	if (status == FALSE)
+	{
+		//TODO: Doc -> See GetLastError()
+	}
+
+	return status;
+}
+
+DLLEXPORT BOOL APIENTRY MountV(int nDosDriveNo, char *szFileName, Password VolumePassword)
+{
+	BOOL status = FALSE;
+
+	TCAPI_CHECK_INITIALIZED(0);
+
+	status = Mount (NULL, nDosDriveNo, szFileName, VolumePassword);
 	if (status == FALSE)
 	{
 		//TODO: Doc -> See GetLastError()
