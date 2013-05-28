@@ -23,6 +23,8 @@ using namespace TrueCrypt;
 MountOptions mountOptions;
 MountOptions defaultMountOptions;
 
+VOLUME_NOTIFICATIONS_LIST	VolumeNotificationsList;	
+
 int bPrebootPasswordDlgMode = FALSE;
 int WrongPwdRetryCounter = 0;
 BOOL MultipleMountOperationInProgress = FALSE;
@@ -96,7 +98,6 @@ std::string VolumeGuidPathToDevicePath (std::string volumeGuidPath)
 
 	return partitionPath.empty() ? volDevPath : partitionPath;
 }
-
 
 std::string HarddiskVolumePathToPartitionPath (const std::string &harddiskVolumePath)
 {
@@ -181,7 +182,6 @@ void IncreaseWrongPwdRetryCount (int count)
 {
 	WrongPwdRetryCounter += count;
 }
-
 
 void ResetWrongPwdRetryCount (void)
 {
@@ -465,49 +465,28 @@ int IsSystemDevicePath (char *path, BOOL bReliableRequired)
 // mounting a partition (as a regular volume) that is within key scope of system encryption.
 // Returns TRUE if the partition can be mounted as a partition within key scope of inactive system encryption.
 // If devicePath is empty, the currently selected partition in the GUI is checked.
-BOOL CheckSysEncMountWithoutPBA (const char *devicePath, BOOL quiet)
+BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 {
-	BOOL tmpbDevice;
+	//BOOL tmpbDevice;
 	char szDevicePath [TC_MAX_PATH+1];
 	char szDiskFile [TC_MAX_PATH+1];
 
 	if (strlen (devicePath) < 2)
 	{
-		//TODO: Error
-
-		//GetWindowText (GetDlgItem (MainDlg, IDC_VOLUME), szDevicePath, sizeof (szDevicePath));
-		CreateFullVolumePath (szDiskFile, szDevicePath, &tmpbDevice);
-
-		//if (!tmpbDevice)
-		//{
-		//	if (!quiet)
-		//		TODO: Error
-		//		Warning ("NO_SYSENC_PARTITION_SELECTED");
-
-		//	return FALSE;
-		//}
-
-		//if (LOWORD (GetSelectedLong (GetDlgItem (MainDlg, IDC_DRIVELIST))) != TC_MLIST_ITEM_FREE)
-		//{
-		//	if (!quiet)
-		//		Warning ("SELECT_FREE_DRIVE");
-
-		//	return FALSE;
-		//}
+		debug_out("TCAPI_E_PARAM_INCORRECT", TCAPI_E_PARAM_INCORRECT);
+		SetLastError(TCAPI_E_PARAM_INCORRECT);
+		return FALSE;
 	}
 	else
 		strncpy (szDevicePath, devicePath, sizeof (szDevicePath));
 
 	char *partionPortion = strrchr (szDevicePath, '\\');
 
-	if (!partionPortion
-		|| !_stricmp (partionPortion, "\\Partition0"))
+	if (!partionPortion || !_stricmp (partionPortion, "\\Partition0"))
 	{
 		// Only partitions are supported (not whole drives)
-		//if (!quiet)
-			//TODO: Error
-			//Warning ("NO_SYSENC_PARTITION_SELECTED");
-
+		debug_out("TCAPI_E_NO_SYSENC_PARTITION", TCAPI_E_NO_SYSENC_PARTITION);
+		SetLastError(TCAPI_E_NO_SYSENC_PARTITION);
 		return FALSE;
 	}
 
@@ -523,9 +502,8 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath, BOOL quiet)
 
 			if (sscanf (szDevicePath, "\\Device\\Harddisk%d\\Partition", &driveNo) != 1)
 			{
-				if (!quiet)
-					Error ("INVALID_PATH");
-
+				debug_out("TCAPI_E_INVALID_PATH", TCAPI_E_INVALID_PATH);
+				SetLastError(TCAPI_E_INVALID_PATH);
 				return FALSE;
 			}
 
@@ -534,24 +512,17 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath, BOOL quiet)
 				"\\Device\\Harddisk%d\\Partition0",
 				driveNo);
 
-			//WaitCursor ();
-
 			// This is critical (re-mounting a mounted system volume as a normal volume could cause data corruption)
 			// so we force the slower but reliable method
 			retCode = IsSystemDevicePath (parentDrivePath, TRUE);
-
-			//NormalCursor();
 
 			if (retCode != 2)
 				return TRUE;
 			else
 			{
 				// The partition is located on active system drive
-
-				//TODO: error
-				//if (!quiet)
-				//	Warning ("MOUNT_WITHOUT_PBA_VOL_ON_ACTIVE_SYSENC_DRIVE");
-
+				debug_out("TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE", TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE);
+				SetLastError(TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE);
 				return FALSE;
 			}
 		}
@@ -560,8 +531,7 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath, BOOL quiet)
 	}
 	catch (Exception &e)
 	{
-		//NormalCursor();
-		//TODO: Error
+		// exception sets last error
 		e.Show ();
 	}
 
@@ -587,16 +557,10 @@ BOOL WrongPwdRetryCountOverLimit (void)
 void CheckFilesystem (int driveNo, BOOL fixErrors)
 {
 	wchar_t param[1024];
-	//wchar_t msg[1024], param[1024];
-	//char driveRoot[] = { 'A' + (char) driveNo, ':', 0 };
+	char driveRoot[] = { 'A' + (char) driveNo, ':', 0 };
 
-	//TODO:
-	//if (fixErrors && AskWarnYesNo ("FILESYS_REPAIR_CONFIRM_BACKUP") == IDNO)
-	//	return;
-
-	//wsprintfW (msg, GetString (fixErrors ? "REPAIRING_FS" : "CHECKING_FS"), driveRoot);
-	//wsprintfW (param, fixErrors ? L"/C echo %s & chkdsk %hs /F /X & pause" : L"/C echo %s & chkdsk %hs & pause", msg, driveRoot);
-
+	//TODO: needs testing
+	wsprintfW (param, fixErrors ? L"/C chkdsk %hs /F /X & pause" : L"/C chkdsk %hs & pause", driveRoot);
 	ShellExecuteW (NULL, (!IsAdmin() && IsUacSupported()) ? L"runas" : L"open", L"cmd.exe", param, NULL, SW_SHOW);
 }
 
@@ -611,15 +575,7 @@ void CheckFilesystem (int driveNo, BOOL fixErrors)
 // Note that some code calling this relies on the content of the mountOptions struct
 // to remain unmodified (don't remove the 'const' without proper revision).
 
-int MountVolume (HWND hwndDlg,
-	int driveNo,
-	char *volumePath,
-	Password *password,
-	BOOL cachePassword,
-	BOOL sharedAccess,
-	const MountOptions* const mountOptions,
-	BOOL quiet,
-	BOOL bReportWrongPassword)
+int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword)
 {
 	MOUNT_STRUCT mount;
 	DWORD dwResult;
@@ -629,14 +585,13 @@ int MountVolume (HWND hwndDlg,
 
 	if (mountOptions->PartitionInInactiveSysEncScope)
 	{
-		if (!CheckSysEncMountWithoutPBA (volumePath, quiet))
+		if (!CheckSysEncMountWithoutPBA (volumePath))
 			return -1;
 	}
 
 	if (IsMountedVolume (volumePath))
 	{
-		if (!quiet)
-			Error ("VOL_ALREADY_MOUNTED");
+		SetLastError(TCAPI_E_VOL_ALREADY_MOUNTED);
 		return -1;
 	}
 
@@ -1237,4 +1192,89 @@ ret:
 	//	SecurityToken::CloseAllSessions();
 
 	return status;
+}
+
+BOOL UnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forceUnmount)
+{
+	int result;
+	BOOL forced = forceUnmount;
+	int dismountMaxRetries = UNMOUNT_MAX_AUTO_RETRIES;
+
+//retry:
+	BroadcastDeviceChange (DBT_DEVICEREMOVEPENDING, nDosDriveNo, 0);
+
+	do
+	{
+		result = DriverUnmountVolume (hwndDlg, nDosDriveNo, forced);
+
+		if (result == ERR_FILES_OPEN)
+			Sleep (UNMOUNT_AUTO_RETRY_DELAY);
+		else
+			break;
+
+	} while (--dismountMaxRetries > 0);
+
+	if (result != 0)
+	{
+		if (result == ERR_FILES_OPEN && !Silent)
+		{
+			//TODO:
+			//if (IDYES == AskWarnYesNoTopmost ("UNMOUNT_LOCK_FAILED"))
+			//{
+				//forced = TRUE;
+				//goto retry;
+			//}
+
+			if (IsOSAtLeast (WIN_7))
+			{
+				// Undo SHCNE_DRIVEREMOVED
+				char root[] = { (char) nDosDriveNo + 'A', ':', '\\', 0 };
+				SHChangeNotify (SHCNE_DRIVEADD, SHCNF_PATH, root, NULL);
+			}
+
+			return FALSE;
+		}
+
+		Error ("UNMOUNT_FAILED");
+
+		return FALSE;
+	} 
+
+	BroadcastDeviceChange (DBT_DEVICEREMOVECOMPLETE, nDosDriveNo, 0);
+
+	return TRUE;
+}
+
+int DriverUnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forced)
+{
+	UNMOUNT_STRUCT unmount;
+	DWORD dwResult;
+
+	BOOL bResult;
+
+	unmount.nDosDriveNo = nDosDriveNo;
+	unmount.ignoreOpenFiles = forced;
+
+	bResult = DeviceIoControl (hDriver, TC_IOCTL_DISMOUNT_VOLUME, &unmount,
+		sizeof (unmount), &unmount, sizeof (unmount), &dwResult, NULL);
+
+	if (bResult == FALSE)
+	{
+		handleWin32Error ();
+		return 1;
+	}
+
+	if (unmount.nReturnCode == ERR_SUCCESS
+		&& unmount.HiddenVolumeProtectionTriggered
+		&& !VolumeNotificationsList.bHidVolDamagePrevReported [nDosDriveNo])
+	{
+		//wchar_t msg[4096];
+
+		VolumeNotificationsList.bHidVolDamagePrevReported [nDosDriveNo] = TRUE;
+		//swprintf (msg, GetString ("DAMAGE_TO_HIDDEN_VOLUME_PREVENTED"), nDosDriveNo + 'A');
+		//SetForegroundWindow (hwndDlg);
+		//MessageBoxW (hwndDlg, msg, lpszTitle, MB_ICONWARNING | MB_SETFOREGROUND | MB_TOPMOST);
+	}
+
+	return unmount.nReturnCode;
 }

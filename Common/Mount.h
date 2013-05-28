@@ -23,6 +23,8 @@ extern "C" {
 	// try using the embedded header backup (if any). This ensures that the "Incorrect password" message is reported faster
 	// initially (most such errors are really caused by supplying an incorrect password, not by header corruption).
 #define TC_TRY_HEADER_BAK_AFTER_NBR_WRONG_PWD_TRIES		2
+#define UNMOUNT_MAX_AUTO_RETRIES 30
+#define UNMOUNT_AUTO_RETRY_DELAY 50
 
 	typedef struct
 	{
@@ -74,6 +76,14 @@ extern "C" {
 	extern MountOptions mountOptions;
 	extern MountOptions defaultMountOptions;
 
+	typedef struct
+	{
+		BOOL bHidVolDamagePrevReported[26];
+	} VOLUME_NOTIFICATIONS_LIST;
+
+	extern VOLUME_NOTIFICATIONS_LIST VolumeNotificationsList;
+
+
 	BOOL IsMountedVolume (const char *volname);
 	BOOL VolumePathExists (char *volumePath);
 	BOOL OpenDevice (const char *lpszPath, OPEN_TEST_STRUCT *driver, BOOL detectFilesystem);
@@ -81,20 +91,12 @@ extern "C" {
 	void ResetWrongPwdRetryCount (void);
 	BOOL GetSysDevicePaths (void);
 	int IsSystemDevicePath (char *path, BOOL bReliableRequired);
-	BOOL CheckSysEncMountWithoutPBA (const char *devicePath, BOOL quiet);
+	BOOL CheckSysEncMountWithoutPBA (const char *devicePath);
 	BOOL IsDriveAvailable (int driveNo);
 	BOOL IsPasswordCacheEmpty (void);
 	BOOL WrongPwdRetryCountOverLimit (void);
 	void CheckFilesystem (int driveNo, BOOL fixErrors);
-	int MountVolume (HWND hwndDlg,
-		int driveNo,
-		char *volumePath,
-		Password *password,
-		BOOL cachePassword,
-		BOOL sharedAccess,
-		const MountOptions* const mountOptions,
-		BOOL quiet,
-		BOOL bReportWrongPassword);
+	int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword);
 	void BroadcastDeviceChange (WPARAM message, int nDosDriveNo, DWORD driveMap);
 	BOOL CheckFileExtension (char *fileName);
 	int GetModeOfOperationByDriveNo (int nDosDriveNo);
@@ -103,6 +105,8 @@ extern "C" {
 	BOOL GetDriveLabel (int driveNo, wchar_t *label, int labelSize);
 	char GetSystemDriveLetter (void);
 	BOOL GetDeviceInfo (const char *deviceName, DISK_PARTITION_INFO_STRUCT *info);
+	BOOL UnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forceUnmount);
+	int DriverUnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forced);
 
 #ifdef __cplusplus
 }
