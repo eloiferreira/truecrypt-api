@@ -122,3 +122,31 @@ int ErrorDirect (const wchar_t *errMsg)
 	return 0;
 }
 
+void HandlePasswordError(void)
+{
+	//WCHAR szTmp[8192];
+
+	//swprintf (szTmp, (KeyFilesEnable ? "PASSWORD_OR_KEYFILE_WRONG" : "PASSWORD_WRONG");
+	//if (CheckCapsLock (hwndDlg, TRUE))
+	//	wcscat (szTmp, "PASSWORD_WRONG_CAPSLOCK_ON");
+
+	//if (TCBootLoaderOnInactiveSysEncDrive ())
+	//{
+	//	swprintf (szTmp, GetString (KeyFilesEnable ? "PASSWORD_OR_KEYFILE_OR_MODE_WRONG" : "PASSWORD_OR_MODE_WRONG"));
+
+	//	if (CheckCapsLock (hwndDlg, TRUE))
+	//		wcscat (szTmp, GetString ("PASSWORD_WRONG_CAPSLOCK_ON"));
+
+	//	wcscat (szTmp, GetString ("SYSENC_MOUNT_WITHOUT_PBA_NOTE"));
+	//}
+
+	//wstring msg = szTmp;
+
+	//if (KeyFilesEnable && HiddenFilesPresentInKeyfilePath)
+	//{
+	//	msg += GetString ("HIDDEN_FILES_PRESENT_IN_KEYFILE_PATH");
+	//	HiddenFilesPresentInKeyfilePath = FALSE;
+	//}
+
+	return;
+}

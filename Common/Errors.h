@@ -112,6 +112,9 @@ static const DWORD TCAPI_E_PARAM_INCORRECT						= MAKE_TCAPI_ERROR(31);
 static const DWORD TCAPI_E_NO_SYSENC_PARTITION					= MAKE_TCAPI_ERROR(32);
 static const DWORD TCAPI_E_INVALID_PATH							= MAKE_TCAPI_ERROR(33);
 static const DWORD TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE	= MAKE_TCAPI_ERROR(34);
+static const DWORD TCAPI_E_DRIVE_LETTER_UNAVAILABLE				= MAKE_TCAPI_ERROR(35);
+static const DWORD TCAPI_E_PASSWORD_NULL_AND_NOT_CACHED			= MAKE_TCAPI_ERROR(36);
+static const DWORD TCAPI_E_FILE_IN_USE							= MAKE_TCAPI_ERROR(37);
 
 static const DWORD TCAPI_W_AUTOMOUNT_DISABLED			= MAKE_TCAPI_WARNING(1);
 static const DWORD TCAPI_W_ASSIGN_DRIVE_LETTER			= MAKE_TCAPI_WARNING(2);
@@ -124,8 +127,10 @@ static const DWORD TCAPI_W_STALE_SERVICE				= MAKE_TCAPI_WARNING(8);
 static const DWORD TCAPI_W_DRIVER_NOT_LOADED			= MAKE_TCAPI_WARNING(9);
 static const DWORD TCAPI_W_VOLUMES_STILL_MOUNTED		= MAKE_TCAPI_WARNING(10);
 static const DWORD TCAPI_W_APPS_STILL_ATTACHED			= MAKE_TCAPI_WARNING(11);
+static const DWORD TCAPI_W_HEADER_DAMAGED_BACKUP_USED	= MAKE_TCAPI_WARNING(12);
 
 #define debug_out(msg, err_no) do { DebugOut(__FUNCTION__, msg, err_no); } while (0)
+#define set_error_debug_out(error) do { SetLastError(error); DebugOut(__FUNCTION__, "\"" __VA_ARGS__ "\"", error); } while (0);
 #define handle_win_error do {DWORD err = MAKE_WINDOWS_ERROR(GetLastError()); debug_out("WINDOWS_ERROR", err); SetLastError(err); } while (0)
 
 #ifdef __cplusplus
@@ -140,6 +145,7 @@ extern "C" {
 	void DebugOut(const char *src, const char *msg, DWORD err_no);
 	int Error (const char *stringId);
 	int ErrorDirect (const wchar_t *errMsg);
+	void HandlePasswordError(void);
 
 #ifdef __cplusplus
 }

@@ -469,12 +469,11 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 {
 	//BOOL tmpbDevice;
 	char szDevicePath [TC_MAX_PATH+1];
-	char szDiskFile [TC_MAX_PATH+1];
+	//char szDiskFile [TC_MAX_PATH+1];
 
 	if (strlen (devicePath) < 2)
 	{
-		debug_out("TCAPI_E_PARAM_INCORRECT", TCAPI_E_PARAM_INCORRECT);
-		SetLastError(TCAPI_E_PARAM_INCORRECT);
+		set_error_debug_out(TCAPI_E_PARAM_INCORRECT);
 		return FALSE;
 	}
 	else
@@ -485,8 +484,7 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 	if (!partionPortion || !_stricmp (partionPortion, "\\Partition0"))
 	{
 		// Only partitions are supported (not whole drives)
-		debug_out("TCAPI_E_NO_SYSENC_PARTITION", TCAPI_E_NO_SYSENC_PARTITION);
-		SetLastError(TCAPI_E_NO_SYSENC_PARTITION);
+		set_error_debug_out(TCAPI_E_NO_SYSENC_PARTITION);
 		return FALSE;
 	}
 
@@ -502,8 +500,7 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 
 			if (sscanf (szDevicePath, "\\Device\\Harddisk%d\\Partition", &driveNo) != 1)
 			{
-				debug_out("TCAPI_E_INVALID_PATH", TCAPI_E_INVALID_PATH);
-				SetLastError(TCAPI_E_INVALID_PATH);
+				set_error_debug_out(TCAPI_E_INVALID_PATH);
 				return FALSE;
 			}
 
@@ -521,8 +518,7 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 			else
 			{
 				// The partition is located on active system drive
-				debug_out("TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE", TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE);
-				SetLastError(TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE);
+				set_error_debug_out(TCAPI_E_NOPBA_MOUNT_ON_ACTIVE_SYSENC_DRIVE);
 				return FALSE;
 			}
 		}
@@ -575,7 +571,7 @@ void CheckFilesystem (int driveNo, BOOL fixErrors)
 // Note that some code calling this relies on the content of the mountOptions struct
 // to remain unmodified (don't remove the 'const' without proper revision).
 
-int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword)
+int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword, BOOL bRetryIfInUse)
 {
 	MOUNT_STRUCT mount;
 	DWORD dwResult;
@@ -591,21 +587,22 @@ int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePa
 
 	if (IsMountedVolume (volumePath))
 	{
-		SetLastError(TCAPI_E_VOL_ALREADY_MOUNTED);
+		set_error_debug_out(TCAPI_E_VOL_ALREADY_MOUNTED);
 		return -1;
 	}
 
 	if (!IsDriveAvailable (driveNo))
 	{
-		if (!quiet)
-			Error ("DRIVE_LETTER_UNAVAILABLE");
-
+		set_error_debug_out(TCAPI_E_DRIVE_LETTER_UNAVAILABLE);
 		return -1;
 	}
 
 	// If using cached passwords, check cache status first
 	if (password == NULL && IsPasswordCacheEmpty ())
+	{
+		set_error_debug_out(TCAPI_E_PASSWORD_NULL_AND_NOT_CACHED);
 		return 0;
+	}
 
 	ZeroMemory (&mount, sizeof (mount));
 	mount.bExclusiveAccess = sharedAccess ? FALSE : TRUE;
@@ -714,32 +711,22 @@ retry:
 
 			if (mount.bExclusiveAccess == FALSE)
 			{
-				if (!quiet)
-					Error ("FILE_IN_USE_FAILED");
-
+				set_error_debug_out(TCAPI_E_FILE_IN_USE);
 				return -1;
 			}
 			else
 			{
-				if (quiet)
+				if (bRetryIfInUse)
 				{
 					mount.bExclusiveAccess = FALSE;
 					goto retry;
 				}
-
-				//TODO: Implement options
-				// Ask user 
-				//if (IDYES == AskWarnNoYes ("FILE_IN_USE"))
-				//{
-				//	mount.bExclusiveAccess = FALSE;
-				//	goto retry;
-				//}
 			}
 
 			return -1;
 		}
 
-		if (!quiet && (!MultipleMountOperationInProgress || GetLastError() != ERROR_NOT_READY))
+		if (!MultipleMountOperationInProgress || GetLastError() != ERROR_NOT_READY) 
 			handleWin32Error ();
 
 		return -1;
@@ -776,28 +763,19 @@ retry:
 
 						DWORD dwResult;
 						if (DeviceIoControl (hDriver, TC_IOCTL_OPEN_TEST, &openTestStruct, sizeof (OPEN_TEST_STRUCT), &openTestStruct, sizeof (OPEN_TEST_STRUCT), &dwResult, NULL) && openTestStruct.TCBootLoaderDetected)
-							Error("HIDDEN_VOL_PROT_PASSWORD_US_KEYB_LAYOUT");
-							//TODO:	
-						//WarningDirect ((GetWrongPasswordErrorMessage (hwndDlg) + L"\n\n" + GetString ("HIDDEN_VOL_PROT_PASSWORD_US_KEYB_LAYOUT")).c_str());
+							HandlePasswordError();
 						else
-							//TODO:	
-							Error("other");
-							//handleError (hwndDlg, mount.nReturnCode);
+							set_error_debug_out(mount.nReturnCode);
 					}
 				}
 				else
-					Error("other");
-				//TODO:
-					//handleError (hwndDlg, mount.nReturnCode);
+					set_error_debug_out(mount.nReturnCode);
 			}
 
 			return 0;
 		}
 
-		if (!quiet)
-			Error("other");
-			//TODO:
-			//handleError (hwndDlg, mount.nReturnCode);
+		set_error_debug_out(mount.nReturnCode);
 
 		return 0;
 	}
@@ -807,10 +785,8 @@ retry:
 	if (mount.UseBackupHeader != mountOptions->UseBackupHeader
 		&& mount.UseBackupHeader)
 	{
-		if (bReportWrongPassword /* && !Silent */)
-			Error("HEADER_DAMAGED_AUTO_USED_HEADER_BAK");
-		//TODO:	
-		//Warning ("HEADER_DAMAGED_AUTO_USED_HEADER_BAK");
+		if (bReportWrongPassword) 
+			set_error_debug_out(TCAPI_W_HEADER_DAMAGED_BACKUP_USED);
 	}
 
 	LastMountedVolumeDirty = mount.FilesystemDirty;
@@ -1079,7 +1055,7 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 	// First try cached passwords and if they fail ask user for a new one
 	//WaitCursor ();
 
-	mounted = MountVolume (hwndDlg, nDosDriveNo, szFileName, NULL, bCacheInDriver, bForceMount, &mountOptions, Silent, FALSE);
+	mounted = MountVolume (nDosDriveNo, szFileName, NULL, bCacheInDriver, bForceMount, &mountOptions, FALSE, TRUE);
 
 	//TODO: keyfiles support
 	// If keyfiles are enabled, test empty password first
@@ -1096,7 +1072,7 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 
 	// Test password and/or keyfiles used for the previous volume
 	if (!mounted && MultipleMountOperationInProgress && VolumePassword.Length != 0)
-		mounted = MountVolume (hwndDlg, nDosDriveNo, szFileName, &VolumePassword, bCacheInDriver, bForceMount, &mountOptions, Silent, FALSE);
+		mounted = MountVolume (nDosDriveNo, szFileName, &VolumePassword, bCacheInDriver, bForceMount, &mountOptions, FALSE, TRUE);
 
 	if (mounted)
 	{
@@ -1136,7 +1112,7 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 		//if (KeyFilesEnable)
 		//	KeyFilesApply (&VolumePassword, FirstKeyFile);
 
-		mounted = MountVolume (hwndDlg, nDosDriveNo, szFileName, &VolumePassword, bCacheInDriver, bForceMount, &mountOptions, Silent, !Silent);
+		mounted = MountVolume (nDosDriveNo, szFileName, &VolumePassword, bCacheInDriver, bForceMount, &mountOptions, TRUE, TRUE);
 		//NormalCursor ();
 
 		// Check for deprecated CBC mode

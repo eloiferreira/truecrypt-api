@@ -96,7 +96,7 @@ extern "C" {
 	BOOL IsPasswordCacheEmpty (void);
 	BOOL WrongPwdRetryCountOverLimit (void);
 	void CheckFilesystem (int driveNo, BOOL fixErrors);
-	int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword);
+	int MountVolume (int driveNo, char *volumePath, Password *password, BOOL cachePassword, BOOL sharedAccess, const MountOptions* const mountOptions, BOOL bReportWrongPassword, BOOL bRetryIfInUse);
 	void BroadcastDeviceChange (WPARAM message, int nDosDriveNo, DWORD driveMap);
 	BOOL CheckFileExtension (char *fileName);
 	int GetModeOfOperationByDriveNo (int nDosDriveNo);
