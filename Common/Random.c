@@ -89,12 +89,12 @@ int Randinit ()
 	}
 
 	hKeyboard = SetWindowsHookEx (WH_KEYBOARD, (HOOKPROC)&KeyboardProc, NULL, GetCurrentThreadId ());
-	if (hKeyboard == 0) handleWin32Error ();
+	if (hKeyboard == 0) HandleWin32Error ();
 
 	hMouse = SetWindowsHookEx (WH_MOUSE, (HOOKPROC)&MouseProc, NULL, GetCurrentThreadId ());
 	if (hMouse == 0)
 	{
-		handleWin32Error ();
+		HandleWin32Error ();
 		goto error;
 	}
 

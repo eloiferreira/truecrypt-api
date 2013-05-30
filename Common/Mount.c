@@ -727,7 +727,7 @@ retry:
 		}
 
 		if (!MultipleMountOperationInProgress || GetLastError() != ERROR_NOT_READY) 
-			handleWin32Error ();
+			HandleWin32Error ();
 
 		return -1;
 	}
@@ -1044,7 +1044,7 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 	if (!VolumePathExists (szFileName))
 	{
 		if (!MultipleMountOperationInProgress)
-			handleWin32Error ();
+			HandleWin32Error ();
 
 		status = FALSE;
 		goto ret;
@@ -1080,15 +1080,15 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 		// Check for deprecated CBC mode
 		modeOfOperation = GetModeOfOperationByDriveNo (nDosDriveNo);
 		if (modeOfOperation == CBC || modeOfOperation == OUTER_CBC)
-			Error("WARN_CBC_MODE");
+			set_error_debug_out(TCAPI_W_CBC_MODE);
 
 		// Check for deprecated 64-bit-block ciphers
 		if (GetCipherBlockSizeByDriveNo (nDosDriveNo) == 64)
-			Error("WARN_64_BIT_BLOCK_CIPHER");
+			set_error_debug_out(TCAPI_W_64_BIT_BLOCK_CIPHER);
 
 		// Check for problematic file extensions (exe, dll, sys)
 		if (CheckFileExtension(szFileName))
-			Error("EXE_FILE_EXTENSION_MOUNT_WARNING");
+			set_error_debug_out(TCAPI_W_FILE_EXTENSION);
 	}
 
 	while (mounted == 0)
@@ -1118,11 +1118,11 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 		// Check for deprecated CBC mode
 		modeOfOperation = GetModeOfOperationByDriveNo (nDosDriveNo);
 		if (modeOfOperation == CBC || modeOfOperation == OUTER_CBC)
-			Error("WARN_CBC_MODE");
+			set_error_debug_out(TCAPI_W_CBC_MODE);
 
 		// Check for deprecated 64-bit-block ciphers
 		if (GetCipherBlockSizeByDriveNo (nDosDriveNo) == 64)
-			Error("WARN_64_BIT_BLOCK_CIPHER");
+			set_error_debug_out(TCAPI_W_64_BIT_BLOCK_CIPHER);
 
 		//TODO:
 		// Check for legacy non-ASCII passwords
@@ -1131,7 +1131,7 @@ BOOL Mount (HWND hwndDlg, int nDosDriveNo, char *szFileName, Password VolumePass
 
 		// Check for problematic file extensions (exe, dll, sys)
 		if (mounted > 0 && CheckFileExtension (szFileName))
-			Error("EXE_FILE_EXTENSION_MOUNT_WARNING");
+			set_error_debug_out(TCAPI_W_FILE_EXTENSION);
 
 		if (!MultipleMountOperationInProgress)
 			burn (&VolumePassword, sizeof (VolumePassword));
@@ -1211,7 +1211,7 @@ BOOL UnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forceUnmount)
 			return FALSE;
 		}
 
-		Error ("UNMOUNT_FAILED");
+		set_error_debug_out(TCAPI_E_UNMOUNT_FAILED);
 
 		return FALSE;
 	} 
@@ -1236,7 +1236,7 @@ int DriverUnmountVolume (HWND hwndDlg, int nDosDriveNo, BOOL forced)
 
 	if (bResult == FALSE)
 	{
-		handleWin32Error ();
+		HandleWin32Error ();
 		return 1;
 	}
 

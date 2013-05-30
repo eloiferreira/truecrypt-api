@@ -1787,7 +1787,7 @@ namespace TrueCrypt
 		if (status != 0)
 		{
 			//TODO: Win32 has nothing to do with this error, improve
-			handleWin32Error ();
+			HandleWin32Error ();
 			return status;
 		}
 
@@ -1850,7 +1850,7 @@ namespace TrueCrypt
 					if (status != 0)
 					{
 						//TODO: Win32 has nothing to do with this error, improve
-						handleWin32Error ();
+						HandleWin32Error ();
 						return status;
 					}
 
@@ -2061,10 +2061,8 @@ namespace TrueCrypt
 			{
 				if (e.ErrorCode != ERROR_CRC)
 				{
-					//TODO:
 					e.Show ();
-					//TODO:
-					Error ("WHOLE_DRIVE_ENCRYPTION_PREVENTED_BY_DRIVERS");
+					set_error_debug_out(TCAPI_E_WHOLE_DRIVE_ENCRYPTION_PREVENTED_BY_DRIVERS);
 					throw UserAbort (SRC_POS);
 				}
 			}

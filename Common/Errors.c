@@ -13,30 +13,30 @@ governed by license terms which are TBD. */
 
 #define MAX_FMT_STRING 1024
 
-void handleWin32Error ()
+void HandleWin32Error ()
 {
 	DWORD dwError = GetLastError ();
 
 	// Access denied
 	if (dwError == ERROR_ACCESS_DENIED && !IsAdmin ())
 	{
-		SetLastError(TCAPI_E_ACCESS_DENIED);
+		set_error_debug_out(TCAPI_E_ACCESS_DENIED);
 		return;
 	}
 
-	// Api-friendly hardware error explanation
 	if (IsDiskError (dwError)) {
-		SetLastError(MAKE_DISK_ERROR(dwError));
+		debug_out("Disk error:", dwError);
 		return;
 	}
 
 	// Device not ready
 	if (dwError == ERROR_NOT_READY) {
-		SetLastError(HandleDriveNotReadyError(dwError));
+		// more details in debug output
+		HandleDriveNotReadyError(dwError);
+		debug_out("Disk not ready:", dwError);
 		return;
 	}
-
-	SetLastError(MAKE_WINDOWS_ERROR(dwError));
+	handle_win_error;
 }
 
 BOOL IsDiskError (DWORD error)
@@ -66,28 +66,33 @@ BOOL IsDiskWriteError (DWORD error)
 		|| error == ERROR_SEM_TIMEOUT);	// I/O operation timeout may be reported as ERROR_SEM_TIMEOUT
 }
 
-DWORD HandleDriveNotReadyError (DWORD reportedError)
+void HandleDriveNotReadyError (DWORD reportedError)
 {
 	HKEY hkey = 0;
 	DWORD value = 0, size = sizeof (DWORD);
-	DWORD result = reportedError;
 
 	if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\MountMgr",
-		0, KEY_READ, &hkey) != ERROR_SUCCESS)
-		return MAKE_WINDOWS_ERROR(result);
+		0, KEY_READ, &hkey) != ERROR_SUCCESS) 
+	{
+		debug_out("Cant get more info:", GetLastError());
+		return;
+	}
 
 	if (RegQueryValueEx (hkey, "NoAutoMount", 0, 0, (LPBYTE) &value, &size) == ERROR_SUCCESS 
 		&& value != 0)
 	{
-		result = TCAPI_W_AUTOMOUNT_DISABLED;
+		debug_out("TCAPI_W_AUTOMOUNT_DISABLED", TCAPI_W_AUTOMOUNT_DISABLED);
 	}
 	else if (nCurrentOS == WIN_VISTA && CurrentOSServicePack < 1)
-		result = TCAPI_W_ASSIGN_DRIVE_LETTER;
+		debug_out("TCAPI_W_ASSIGN_DRIVE_LETTER", TCAPI_W_ASSIGN_DRIVE_LETTER);
 	else
-		result = TCAPI_W_DEVICE_NOT_READY;
+		debug_out("TCAPI_W_DEVICE_NOT_READY", TCAPI_W_DEVICE_NOT_READY);
 
 	RegCloseKey (hkey);
-	return result;
+
+	// preserve original error
+	SetLastError(reportedError);
+	return;
 }
 
 void DebugOut(const char *src, const char *msg, DWORD err_no)
@@ -108,18 +113,6 @@ void DebugOut(const char *src, const char *msg, DWORD err_no)
 	buffer[needed] = 0;
 	OutputDebugString(buffer);
 	free(buffer);
-}
-
-int Error (const char *stringId)
-{
-	//TODO: implementation
-	return 0;
-}
-
-int ErrorDirect (const wchar_t *errMsg)
-{
-	//TODO: implementation
-	return 0;
 }
 
 void HandlePasswordError(void)

@@ -26,8 +26,7 @@ namespace TrueCrypt
 
 		void Show () const
 		{
-			SetLastError (ErrorCode);
-			handleWin32Error ();
+			debug_out("SystemException", ErrorCode);
 		}
 
 		DWORD ErrorCode;
@@ -39,8 +38,7 @@ namespace TrueCrypt
 
 		void Show () const
 		{
-			SetLastError (ErrorCode);
-			handleWin32Error ();
+			debug_out("ErrorException", ErrorCode);
 		}
 
 		DWORD ErrorCode;
@@ -52,10 +50,8 @@ namespace TrueCrypt
 
 		void Show () const
 		{
-			Error(SrcPos);
-			//TODO:
-			//string msgBody = "Parameter incorrect.\n\n\n(If you report a bug in connection with this, please include the following technical information in the bug report:\n" + string (SrcPos) + ")";
-			//MessageBox (parent, msgBody.c_str(), "TrueCrypt", MB_ICONERROR | MB_SETFOREGROUND);
+			SetLastError(TCAPI_E_PARAM_INCORRECT);
+			debug_out(SrcPos, TCAPI_E_PARAM_INCORRECT);
 		}
 
 		const char *SrcPos;
@@ -63,14 +59,26 @@ namespace TrueCrypt
 
 	struct TimeOut : public Exception
 	{
-		TimeOut (const char *srcPos) { }
-		void Show () const { ErrorDirect (L"Timeout"); }
+		TimeOut (const char *srcPos) : SrcPos (srcPos) { }
+
+		void Show () const { 
+			SetLastError(TCAPI_E_TIMEOUTEXCEPTION);
+			debug_out(SrcPos, TCAPI_E_TIMEOUTEXCEPTION);
+		}
+
+		const char *SrcPos;
 	};
 
 	struct UserAbort : public Exception
 	{
-		UserAbort (const char *srcPos) { }
-		void Show () const { }
+		UserAbort (const char *srcPos) : SrcPos (srcPos) { }
+
+		void Show () const {
+			SetLastError(TCAPI_E_USER_ABORT_EXCEPTION);
+			debug_out(SrcPos, TCAPI_E_USER_ABORT_EXCEPTION);
+		}
+
+		const char *SrcPos;
 	};
 }
 
