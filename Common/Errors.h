@@ -110,6 +110,27 @@ static const DWORD TCAPI_E_TIMEOUTEXCEPTION								= MAKE_TCAPI_ERROR(38);
 static const DWORD TCAPI_E_USER_ABORT_EXCEPTION							= MAKE_TCAPI_ERROR(39);  // TODO: might be no need in this
 static const DWORD TCAPI_E_UNMOUNT_FAILED								= MAKE_TCAPI_ERROR(40);
 static const DWORD TCAPI_E_WHOLE_DRIVE_ENCRYPTION_PREVENTED_BY_DRIVERS	= MAKE_TCAPI_ERROR(41);
+static const DWORD TCAPI_E_OUTOFMEMORY									= MAKE_TCAPI_ERROR(42);
+static const DWORD TCAPI_E_WRONG_PASSWORD								= MAKE_TCAPI_ERROR(43);
+static const DWORD TCAPI_E_DRIVE_NOT_FOUND								= MAKE_TCAPI_ERROR(44);
+static const DWORD TCAPI_E_FILES_OPEN									= MAKE_TCAPI_ERROR(45);
+static const DWORD TCAPI_E_FILES_OPEN_LOCK								= MAKE_TCAPI_ERROR(46);
+static const DWORD TCAPI_E_VOL_SIZE_WRONG								= MAKE_TCAPI_ERROR(47);
+static const DWORD TCAPI_E_COMPRESSION_NOT_SUPPORTED					= MAKE_TCAPI_ERROR(48);
+static const DWORD TCAPI_E_PASSWD_CHANGE_VOL_TYPE						= MAKE_TCAPI_ERROR(49);
+static const DWORD TCAPI_E_VOL_SEEKING									= MAKE_TCAPI_ERROR(50);
+static const DWORD TCAPI_E_CIPHER_INIT_FAILURE							= MAKE_TCAPI_ERROR(51);
+static const DWORD TCAPI_E_CIPHER_INIT_WEAK_KEY							= MAKE_TCAPI_ERROR(52);
+static const DWORD TCAPI_E_FILE_OPEN_FAILED								= MAKE_TCAPI_ERROR(53);
+static const DWORD TCAPI_E_MOUNT_FAILED									= MAKE_TCAPI_ERROR(54);
+static const DWORD TCAPI_E_NO_FREE_DRIVES								= MAKE_TCAPI_ERROR(55);
+static const DWORD TCAPI_E_DRIVER_VERSION								= MAKE_TCAPI_ERROR(56);
+static const DWORD TCAPI_E_NEW_VERSION_REQIURED							= MAKE_TCAPI_ERROR(57);
+static const DWORD TCAPI_E_SELF_TEST_FAILED								= MAKE_TCAPI_ERROR(58);
+static const DWORD TCAPI_E_VOL_FORMAT_BAD								= MAKE_TCAPI_ERROR(59);
+static const DWORD TCAPI_E_ENCRYPTION_NOT_COMPLETED						= MAKE_TCAPI_ERROR(60);
+static const DWORD TCAPI_E_NONSYS_INPLACE_ENCRYPTION_INCOMPLETE			= MAKE_TCAPI_ERROR(61);
+static const DWORD TCAPI_E_SYS_HID_VOL_REENC_MODE_WRONG					= MAKE_TCAPI_ERROR(62);
 
 static const DWORD TCAPI_W_AUTOMOUNT_DISABLED			= MAKE_TCAPI_WARNING(1);
 static const DWORD TCAPI_W_ASSIGN_DRIVE_LETTER			= MAKE_TCAPI_WARNING(2);
@@ -126,22 +147,24 @@ static const DWORD TCAPI_W_HEADER_DAMAGED_BACKUP_USED	= MAKE_TCAPI_WARNING(12);
 static const DWORD TCAPI_W_CBC_MODE						= MAKE_TCAPI_WARNING(13);
 static const DWORD TCAPI_W_64_BIT_BLOCK_CIPHER			= MAKE_TCAPI_WARNING(14);
 static const DWORD TCAPI_W_FILE_EXTENSION				= MAKE_TCAPI_WARNING(15);
+static const DWORD TCAPI_W_USER_ABORT					= MAKE_TCAPI_WARNING(16);
 
 #define debug_out(msg, err_no) do { DebugOut(__FUNCTION__, msg, err_no); } while (0)
 #define set_error_debug_out(error) do { SetLastError(error); DebugOut(__FUNCTION__, #error, error); } while (0);
-#define handle_win_error do {DWORD err = GetLastError(); debug_out("WINDOWS_ERROR", err); } while (0)
+#define handle_win_error() do {DWORD err = GetLastError(); debug_out("WINDOWS_ERROR", err); } while (0)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-	void HandleWin32Error();
+	void DebugOut(const char *src, const char *msg, DWORD err_no);
 	BOOL IsDiskError (DWORD error);
 	BOOL IsDiskReadError (DWORD error);
 	BOOL IsDiskWriteError (DWORD error);
+	void HandleWin32Error();
 	void HandleDriveNotReadyError (DWORD reportedError);
-	void DebugOut(const char *src, const char *msg, DWORD err_no);
 	void HandlePasswordError(void);
+	void HandleTcError (int code);
 
 #ifdef __cplusplus
 }

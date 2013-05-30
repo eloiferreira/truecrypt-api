@@ -57,7 +57,7 @@ namespace TrueCrypt
 			FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_WRITE_THROUGH, NULL);
 
 		if (Handle == INVALID_HANDLE_VALUE) {
-			handle_win_error;
+			handle_win_error();
 			throw_sys_if(true);
 		}
 
@@ -81,7 +81,7 @@ namespace TrueCrypt
 		DWORD bytesRead;
 
 		if (!ReadFile (Handle, buffer, size, &bytesRead, NULL)) {
-			handle_win_error;
+			handle_win_error();
 			throw_sys_if(true);
 		}
 		//FilePointerPosition += bytesRead;
@@ -95,7 +95,7 @@ namespace TrueCrypt
 		LARGE_INTEGER pos;
 		pos.QuadPart = position;
 		if (!SetFilePointerEx (Handle, pos, NULL, FILE_BEGIN)) {
-			handle_win_error;
+			handle_win_error();
 			throw_sys_if(true);
 		}
 	}
@@ -107,7 +107,7 @@ namespace TrueCrypt
 		try
 		{
 			if (!WriteFile (Handle, buffer, size, &bytesWritten, NULL) || bytesWritten != size) {
-				handle_win_error;
+				handle_win_error();
 				throw_sys_if(true);
 			}
 			//FilePointerPosition += bytesWritten;
@@ -141,7 +141,7 @@ namespace TrueCrypt
 			FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_WRITE_THROUGH, NULL);
 
 		if (Handle == INVALID_HANDLE_VALUE) {
-			handle_win_error;
+			handle_win_error();
 			throw_sys_if(true);
 		}
 
@@ -172,7 +172,7 @@ namespace TrueCrypt
 		DWORD bytesReturned;
 		
 		if (!DeviceIoControl (hDriver, ioctl, input, inputSize, output, outputSize, &bytesReturned, NULL)) {
-			handle_win_error;
+			handle_win_error();
 			throw_sys_if(true);
 		}
 	}

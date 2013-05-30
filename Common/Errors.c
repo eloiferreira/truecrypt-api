@@ -36,7 +36,7 @@ void HandleWin32Error ()
 		debug_out("Disk not ready:", dwError);
 		return;
 	}
-	handle_win_error;
+	handle_win_error();
 }
 
 BOOL IsDiskError (DWORD error)
@@ -142,4 +142,96 @@ void HandlePasswordError(void)
 	//}
 
 	return;
+}
+
+void HandleTcError (int code)
+{
+
+	switch (code)
+	{
+	case ERR_OS_ERROR:
+		HandleWin32Error ();
+		break;
+	case ERR_OUTOFMEMORY:
+		set_error_debug_out(TCAPI_E_OUTOFMEMORY);
+		break;
+	case ERR_PASSWORD_WRONG:
+		set_error_debug_out(TCAPI_E_WRONG_PASSWORD);
+		break;
+	case ERR_DRIVE_NOT_FOUND:
+		set_error_debug_out(TCAPI_E_DRIVE_NOT_FOUND);
+		break;
+	case ERR_FILES_OPEN:
+		set_error_debug_out(TCAPI_E_FILES_OPEN);
+		break;
+	case ERR_FILES_OPEN_LOCK:
+		set_error_debug_out(TCAPI_E_FILES_OPEN_LOCK);
+		break;
+	case ERR_VOL_SIZE_WRONG:
+		set_error_debug_out(TCAPI_E_VOL_SIZE_WRONG);
+		break;
+	case ERR_COMPRESSION_NOT_SUPPORTED:
+		set_error_debug_out(TCAPI_E_COMPRESSION_NOT_SUPPORTED);
+		break;
+	case ERR_PASSWORD_CHANGE_VOL_TYPE:
+		set_error_debug_out(TCAPI_E_PASSWD_CHANGE_VOL_TYPE);
+		break;
+	case ERR_VOL_SEEKING:
+		set_error_debug_out(TCAPI_E_VOL_SEEKING);
+		break;
+	case ERR_CIPHER_INIT_FAILURE:
+		set_error_debug_out(TCAPI_E_CIPHER_INIT_FAILURE);
+		break;
+	case ERR_CIPHER_INIT_WEAK_KEY:
+		set_error_debug_out(TCAPI_E_CIPHER_INIT_WEAK_KEY);
+		break;
+	case ERR_VOL_ALREADY_MOUNTED:
+		set_error_debug_out(TCAPI_E_VOL_ALREADY_MOUNTED);
+		break;
+	case ERR_FILE_OPEN_FAILED:
+		set_error_debug_out(TCAPI_E_FILE_OPEN_FAILED);
+		break;
+	case ERR_VOL_MOUNT_FAILED:
+		set_error_debug_out(TCAPI_E_MOUNT_FAILED);
+		break;
+	case ERR_NO_FREE_DRIVES:
+		set_error_debug_out(TCAPI_E_NO_FREE_DRIVES);
+		break;
+	case ERR_ACCESS_DENIED:
+		set_error_debug_out(TCAPI_E_ACCESS_DENIED);
+		break;
+	case ERR_DRIVER_VERSION:
+		set_error_debug_out(TCAPI_E_DRIVER_VERSION);
+		break;
+	case ERR_NEW_VERSION_REQUIRED:
+		set_error_debug_out(TCAPI_E_NEW_VERSION_REQIURED);
+		break;
+	case ERR_SELF_TESTS_FAILED:
+		set_error_debug_out(TCAPI_E_SELF_TEST_FAILED);
+		break;
+	case ERR_VOL_FORMAT_BAD:
+		set_error_debug_out(TCAPI_E_VOL_FORMAT_BAD);
+		break;
+	case ERR_ENCRYPTION_NOT_COMPLETED:
+		set_error_debug_out(TCAPI_E_ENCRYPTION_NOT_COMPLETED);
+		break;
+	case ERR_NONSYS_INPLACE_ENC_INCOMPLETE:
+		set_error_debug_out(TCAPI_E_NONSYS_INPLACE_ENCRYPTION_INCOMPLETE);
+		break;
+	case ERR_SYS_HIDVOL_HEAD_REENC_MODE_WRONG:
+		set_error_debug_out(TCAPI_E_SYS_HID_VOL_REENC_MODE_WRONG);
+		break;
+	case ERR_PARAMETER_INCORRECT:
+		set_error_debug_out(TCAPI_E_PARAM_INCORRECT);
+		break;
+	case ERR_USER_ABORT:
+		set_error_debug_out(TCAPI_W_USER_ABORT);
+		break;
+	case ERR_DONT_REPORT:
+		// A non-error
+		break;
+	default:
+		SetLastError(MAKE_TCAPI_ERROR(code));
+		debug_out("UNKNOWN TRUECRYPT ERROR", MAKE_TCAPI_ERROR(code));
+	}
 }

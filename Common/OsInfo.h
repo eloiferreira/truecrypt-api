@@ -54,7 +54,6 @@ extern "C" {
 	BOOL IsOSAtLeast (OSVersionEnum reqMinOS);
 	BOOL IsOSVersionAtLeast (OSVersionEnum reqMinOS, int reqMinServicePack);
 	BOOL Is64BitOs ();
-	BOOL ResolveSymbolicLink (const wchar_t *symLinkName, PWSTR targetName);
 	BOOL GetDriveGeometry (const char *deviceName, PDISK_GEOMETRY diskGeometry);
 	BYTE *MapResource (char *resourceType, int resourceId, PDWORD size);
 	BOOL FileExists (const char *filePathPtr);

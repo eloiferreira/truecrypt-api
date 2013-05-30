@@ -527,7 +527,6 @@ BOOL CheckSysEncMountWithoutPBA (const char *devicePath)
 	}
 	catch (Exception &e)
 	{
-		// exception sets last error
 		e.Show ();
 	}
 
@@ -765,17 +764,17 @@ retry:
 						if (DeviceIoControl (hDriver, TC_IOCTL_OPEN_TEST, &openTestStruct, sizeof (OPEN_TEST_STRUCT), &openTestStruct, sizeof (OPEN_TEST_STRUCT), &dwResult, NULL) && openTestStruct.TCBootLoaderDetected)
 							HandlePasswordError();
 						else
-							set_error_debug_out(mount.nReturnCode);
+							HandleTcError(mount.nReturnCode);
 					}
 				}
 				else
-					set_error_debug_out(mount.nReturnCode);
+					HandleTcError(mount.nReturnCode);
 			}
 
 			return 0;
 		}
 
-		set_error_debug_out(mount.nReturnCode);
+		HandleTcError(mount.nReturnCode);
 
 		return 0;
 	}

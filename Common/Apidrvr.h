@@ -328,6 +328,7 @@ extern "C" {
 	static int GetDriverRefCount (void);
 	static void NotifyDriverOfPortableMode (void);
 	uint32 ReadDriverConfigurationFlags ();
+	BOOL ResolveSymbolicLink (const wchar_t *symLinkName, PWSTR targetName);
 
 #ifdef __cplusplus
 }
