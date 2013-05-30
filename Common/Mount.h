@@ -83,7 +83,6 @@ extern "C" {
 
 	extern VOLUME_NOTIFICATIONS_LIST VolumeNotificationsList;
 
-
 	BOOL IsMountedVolume (const char *volname);
 	BOOL VolumePathExists (char *volumePath);
 	BOOL OpenDevice (const char *lpszPath, OPEN_TEST_STRUCT *driver, BOOL detectFilesystem);

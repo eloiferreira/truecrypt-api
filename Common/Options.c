@@ -84,8 +84,7 @@ BOOL ApplyOptions(PTCAPI_OPTIONS options) {
 			}
 			break;
 		default:
-			debug_out("TCAPI_E_WRONG_OPTION", TCAPI_E_WRONG_OPTION);
-			SetLastError(TCAPI_E_WRONG_OPTION);
+			set_error_debug_out(TCAPI_E_WRONG_OPTION);
 			return FALSE;
 		}
 	}
@@ -103,8 +102,7 @@ static BOOL LoadStoredSettings() {
 	EnableHwEncryption ((ReadDriverConfigurationFlags() & TC_DRIVER_CONFIG_DISABLE_HARDWARE_ENCRYPTION) ? FALSE : TRUE);
 
 	if (TryDetectSystemEncryptionStatus()) {
-		debug_out("TCAPI_E_TC_CONFIG_CORRUPTED", TCAPI_E_TC_CONFIG_CORRUPTED);
-		SetLastError(TCAPI_E_TC_CONFIG_CORRUPTED);
+		set_error_debug_out(TCAPI_E_TC_CONFIG_CORRUPTED);
 		return FALSE;
 	}
 

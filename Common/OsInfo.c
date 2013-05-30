@@ -27,8 +27,7 @@ BOOL InitOSVersionInfo ()
 	os.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
 
 	if (GetVersionEx (&os) == FALSE) {
-		debug_out("TCAPI_E_CANT_GET_OS_VER", TCAPI_E_CANT_GET_OS_VER);
-		SetLastError(TCAPI_E_CANT_GET_OS_VER);
+		set_error_debug_out(TCAPI_E_CANT_GET_OS_VER);
 		return FALSE;
 	}
 
@@ -36,8 +35,7 @@ BOOL InitOSVersionInfo ()
 	CurrentOSMinor = os.dwMinorVersion;
 
 	if (CurrentOSMajor < 5) {
-		debug_out("TCAPI_E_UNSUPPORTED_OS", TCAPI_E_UNSUPPORTED_OS);
-		SetLastError(TCAPI_E_UNSUPPORTED_OS);
+		set_error_debug_out(TCAPI_E_UNSUPPORTED_OS);
 		return FALSE;
 	}
 
@@ -51,8 +49,7 @@ BOOL InitOSVersionInfo ()
 	osEx.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
 
 	if (GetVersionEx ((LPOSVERSIONINFOA) &osEx) == FALSE) {
-		debug_out("TCAPI_E_CANT_GET_OS_VER", TCAPI_E_CANT_GET_OS_VER);
-		SetLastError(TCAPI_E_CANT_GET_OS_VER);
+		set_error_debug_out(TCAPI_E_CANT_GET_OS_VER);
 		return FALSE;
 	}
 	
@@ -80,8 +77,7 @@ BOOL InitOSVersionInfo ()
 	{
 		case WIN_2000:
 			if (osEx.wServicePackMajor < 3) {
-				debug_out("TCAPI_W_LARGE_IDE_2K", TCAPI_W_LARGE_IDE_2K);
-				SetLastError(TCAPI_W_LARGE_IDE_2K);
+				set_error_debug_out(TCAPI_W_LARGE_IDE_2K);
 				//TODO: Doc -> check GetLastError() anyway
 				return TRUE;
 			}
@@ -95,9 +91,7 @@ BOOL InitOSVersionInfo ()
 					if (RegQueryValueEx (hkey, "EnableBigLba", 0, 0, (LPBYTE) &val, &size) != ERROR_SUCCESS || val != 1)
 					{
 						RegCloseKey (hkey);
-
-						debug_out("TCAPI_W_LARGE_IDE_2K_REGISTRY", TCAPI_W_LARGE_IDE_2K_REGISTRY);
-						SetLastError(TCAPI_W_LARGE_IDE_2K_REGISTRY);
+						set_error_debug_out(TCAPI_W_LARGE_IDE_2K_REGISTRY);
 						//TODO: Doc -> check GetLastError() anyway
 						return TRUE;
 					}
@@ -112,8 +106,7 @@ BOOL InitOSVersionInfo ()
 				// PE environment does not report version of SP
 				if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, "System\\CurrentControlSet\\Control\\minint", 0, KEY_READ, &k) != ERROR_SUCCESS) 
 				{
-					debug_out("TCAPI_W_LARGE_IDE_XP", TCAPI_W_LARGE_IDE_XP);
-					SetLastError(TCAPI_W_LARGE_IDE_XP);
+					set_error_debug_out(TCAPI_W_LARGE_IDE_XP);
 					//TODO: Doc -> check GetLastError() anyway
 					return TRUE;
 				}

@@ -23,8 +23,7 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 	}
 
 	if (IsTrueCryptInstallerRunning()) {
-		debug_out("TCAPI_E_TC_INSTALLER_RUNNING", TCAPI_E_TC_INSTALLER_RUNNING);
-		SetLastError(TCAPI_E_TC_INSTALLER_RUNNING);
+		set_error_debug_out(TCAPI_E_TC_INSTALLER_RUNNING);
 		return FALSE;
 	}
 
@@ -35,9 +34,7 @@ DLLEXPORT BOOL APIENTRY Initialize(PTCAPI_OPTIONS options) {
 
 	if (!EncryptionThreadPoolStart (ReadEncryptionThreadPoolFreeCpuCountLimit()))
 	{
-		//TODO: Doc -> See GetLastError()
-		debug_out("TCAPI_E_CANT_START_ENCPOOL", TCAPI_E_CANT_START_ENCPOOL);
-		SetLastError(TCAPI_E_CANT_START_ENCPOOL);
+		set_error_debug_out(TCAPI_E_CANT_START_ENCPOOL);
 		return FALSE;
 	}
 
@@ -56,45 +53,18 @@ DLLEXPORT BOOL APIENTRY Shutdown(void) {
 
 DLLEXPORT BOOL APIENTRY LoadTrueCryptDriver(void)
 {
-	int status = FALSE;
-	
 	TCAPI_CHECK_INITIALIZED(0);
-	
-	status = DriverAttach ();
-	if (status == FALSE)
-	{
-		//TODO: Doc -> See GetLastError()
-	}
-
-	return status;
+	return DriverAttach ();
 }
 
 DLLEXPORT BOOL APIENTRY UnloadTrueCryptDriver(void)
 {
-	BOOL status = FALSE;
-
 	TCAPI_CHECK_INITIALIZED(0);
-
-	status = DriverUnload ();
-	if (status == FALSE)
-	{
-		//TODO: Doc -> See GetLastError()
-	}
-
-	return status;
+	return DriverUnload ();
 }
 
 DLLEXPORT BOOL APIENTRY MountV(int nDosDriveNo, char *szFileName, Password VolumePassword)
 {
-	BOOL status = FALSE;
-
 	TCAPI_CHECK_INITIALIZED(0);
-
-	status = Mount (NULL, nDosDriveNo, szFileName, VolumePassword);
-	if (status == FALSE)
-	{
-		//TODO: Doc -> See GetLastError()
-	}
-
-	return status;
+	return Mount (NULL, nDosDriveNo, szFileName, VolumePassword);
 }
