@@ -29,3 +29,5 @@ This project aims to be compatible with TrueCrypt 7.1a driver.
 ##Limitations##
 
 Although TrueCrypt supports several platforms, current target platform of this project is Windows Vista and above.
+
+UPD: 2013-06-15 Currently working on another project
