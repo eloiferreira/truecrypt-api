@@ -30,4 +30,4 @@ This project aims to be compatible with TrueCrypt 7.1a driver.
 
 Although TrueCrypt supports several platforms, current target platform of this project is Windows Vista and above.
 
-UPD: 2013-06-16 Working on Matasano crypto challenges at the moment.
+UPD: 2013-06-17 Working on Matasano crypto challenges at the moment.
